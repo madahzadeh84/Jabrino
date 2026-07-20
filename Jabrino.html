@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="fa">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>جبرینو</title>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap');
+
+    :root {
+      --green-main: #047857;
+      --green-soft: #ecfdf5;
+      --green-border: #a7f3d0;
+
+      --red-main: #b91c1c;
+      --red-soft: #fef2f2;
+      --red-border: #fecaca;
+
+      --neutral-bg: #f9fafb;
+      --neutral-border: #e5e7eb;
+      --text-main: #1f2937;
+    }
+
+
+    body,
+    input,
+    button,
+    textarea {
+      font-family: 'Vazirmatn', 'IranSans', Tahoma, sans-serif;
+      direction: rtl;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    body {
+      background: linear-gradient(180deg, #e8f7ef, #ffffff, #fff1f1);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    /* =========================
+             کارت اصلی
+      ========================= */
+
+    .container {
+      width: 100%;
+      max-width: 520px;
+      background: #ffffff;
+      padding: 30px 26px;
+      border-radius: 18px;
+      box-shadow: 0 18px 35px rgba(0, 0, 0, 0.08);
+      text-align: center;
+      border-top: 6px solid #047857;
+      border-bottom: 6px solid #b91c1c;
+    }
+
+    h1 {
+      color: #047857;
+      margin-bottom: 6px;
+      font-size: 28px
+    }
+
+    .subtitle {
+      color: #555;
+      font-size: 14px;
+      margin-bottom: 22px
+    }
+
+    /* =========================
+   ورودی
+========================= */
+
+    input {
+      width: 100%;
+      padding: 14px;
+      font-size: 18px;
+      border-radius: 12px;
+      border: 2px solid #bbf7d0;
+      direction: ltr;
+      text-align: left;
+      outline: none;
+      margin-bottom: 12px;
+      transition: all .25s ease;
+    }
+
+    input:focus {
+      border-color: #047857;
+      box-shadow: 0 0 0 3px rgba(4, 120, 87, .15)
+    }
+
+    /* =========================
+   دکمه‌ها
+========================= */
+
+    button {
+      padding: 12px 22px;
+      font-size: 15px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .solveBtn {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: white;
+      width: 100%;
+      transition: all .25s ease;
+    }
+
+    .solveBtn:hover {
+      background: linear-gradient(135deg, #dc2626, #b91c1c);
+      transform: translateY(-1px);
+      box-shadow: 0 10px 20px rgba(220, 38, 38, .25);
+    }
+
+    /* پرچم ایران */
+
+    .iran-footer-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 9px;
+      display: flex;
+      flex-direction: column;
+      z-index: 999;
+    }
+
+    .iran-footer-bar .green {
+      background: #1f8a43;
+      height: 3px;
+    }
+
+    .iran-footer-bar .white {
+      background: #ffffff;
+      height: 3px;
+      box-shadow: 0 0 4px rgba(0, 0, 0, 0.15) inset;
+    }
+
+    .iran-footer-bar .red {
+      background: #d62828;
+      height: 3px;
+    }
+
+    /* =========================
+   دکمه راهنما
+========================= */
+
+    .help-floating-btn {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      padding: 9px 20px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #047857, #16a34a);
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 7px 18px rgba(4, 120, 87, .25);
+      transition: all .2s ease;
+    }
+
+    .help-floating-btn span {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .help-floating-btn:hover {
+      transform: translateY(-1px);
+      background: linear-gradient(135deg, #065f46, #15803d);
+    }
+
+    /* =========================
+               مودال
+      ========================= */
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      background: rgba(0, 0, 0, .25);
+      backdrop-filter: blur(3px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .25s ease;
+    }
+
+    .modal.show {
+      display: flex;
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-content {
+      position: relative;
+      width: 100%;
+      max-width: 680px;
+      max-height: 82vh;
+      overflow-y: auto;
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 24px 20px 20px;
+      border-top: 6px solid #047857;
+      border-bottom: 6px solid #b91c1c;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, .15);
+      transform: translateY(20px) scale(.96);
+      opacity: 0;
+      transition: all .25s ease;
+    }
+
+    .modal.show .modal-content {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+
+
+    /* =========================
+   اسکرول بار
+========================= */
+
+    .modal-content::-webkit-scrollbar {
+      width: 10px
+    }
+
+    .modal-content::-webkit-scrollbar-track {
+      background: #f0fdf4;
+      border-radius: 10px
+    }
+
+    .modal-content::-webkit-scrollbar-thumb {
+      background: #16a34a;
+      border-radius: 10px
+    }
+
+    /* =========================
+   تیتر مودال
+========================= */
+
+    .modal-content h2 {
+      margin-bottom: 18px;
+      color: #065f46;
+      font-size: 24px;
+      font-weight: 800;
+      border-bottom: 2px solid #dcfce7;
+      padding-bottom: 8px;
+    }
+
+    /* =========================
+   بخش‌های راهنما
+========================= */
+
+    .help-section {
+      margin-bottom: 16px;
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-right: 4px solid #047857;
+      border-radius: 12px;
+      padding: 14px 15px;
+      transition: all .2s ease;
+    }
+
+    .help-section:hover {
+      background: #fafafa;
+    }
+
+    .help-section h3 {
+      margin-bottom: 10px;
+      color: #047857;
+      font-size: 17px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* خط ظریف قرمز زیر تیتر */
+
+    .help-section h3::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to left, #b91c1c, transparent);
+    }
+
+    .help-section p {
+      margin: 8px 0;
+      color: #374151;
+      line-height: 1.9;
+      font-size: 15px;
+    }
+
+    /* کد داخل متن */
+
+    .help-section code {
+      background: #f9fafb;
+      color: #047857;
+      padding: 2px 8px;
+      border-radius: 7px;
+      font-family: monospace;
+      border: 1px solid #e5e7eb;
+    }
+
+    /* مثال درست */
+
+    .example-box {
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin: 8px 0;
+      font-family: monospace;
+      direction: ltr;
+      text-align: left;
+      background: #f9fafb;
+      color: #065f46;
+      border-right: 3px solid #16a34a;
+      border-left: 1px solid #e5e7eb;
+      border-top: 1px solid #e5e7eb;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    /* مثال غلط */
+
+    .bad-example {
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin: 8px 0;
+      font-family: monospace;
+      direction: ltr;
+      text-align: left;
+      background: #fff7f7;
+      color: #b91c1c;
+      border-right: 3px solid #b91c1c;
+      border-left: 1px solid #fee2e2;
+      border-top: 1px solid #fee2e2;
+      border-bottom: 1px solid #fee2e2;
+    }
+
+    /* =========================
+   دکمه بستن مودال
+========================= */
+
+    .close-btn {
+      position: absolute;
+      top: 12px;
+      right: 14px;
+      width: 34px;
+      height: 34px;
+      border: none;
+      border-radius: 10px;
+      background: #fef2f2;
+      color: #b91c1c;
+      cursor: pointer;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      font-size: 18px;
+      line-height: 1;
+
+      transition: all .2s ease;
+    }
+
+    .close-btn:hover {
+      background: #fee2e2;
+      transform: scale(1.05);
+    }
+
+
+    /* =========================
+   نتیجه
+========================= */
+
+    #result {
+      margin-top: 18px;
+      font-size: 22px;
+      font-weight: bold;
+      color: #065f46
+    }
+
+    /* =========================
+   خطا
+========================= */
+
+    #error {
+      margin-top: 16px;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #b91c1c;
+      padding: 11px;
+      border-radius: 8px;
+      font-size: 14px;
+      display: none;
+    }
+
+    /* =========================
+   مراحل حل
+========================= */
+
+    .stepsBtn {
+      display: none;
+      margin-top: 14px;
+      background: white;
+      border: 2px solid #047857;
+      color: #047857;
+      width: 100%
+    }
+
+    #steps {
+      margin-top: 18px;
+      text-align: right;
+      display: none
+    }
+
+    .step {
+      background: #f0fdf4;
+      border-right: 4px solid var(--green-main);
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 8px;
+      font-size: 14px;
+      line-height: 1.8;
+      border-left: 4px solid var(--red-soft);
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <button id="helpBtn" class="help-floating-btn" type="button" aria-label="راهنمای استفاده">
+      <span>راهنما</span>
+    </button>
+
+    <h1>جبرینو</h1>
+    <div class="subtitle">حل معادله و ساده‌سازی عبارت جبری</div>
+
+    <input id="input" placeholder="7x+4=25  |  2(x+3)">
+
+    <button class="solveBtn" onclick="solve()">محاسبه</button>
+
+    <div id="helpModal" class="modal">
+      <div class="modal-content">
+        <button id="closeHelp" class="close-btn" type="button" aria-label="بستن راهنما">
+          <span>✕</span>
+        </button>
+
+        <h2>راهنمای استفاده از جبرینو</h2>
+
+        <div class="help-section">
+          <h3>جبرینو چیست؟</h3>
+          <p>
+            جبرینو یک <b>Algebra Solver Engine (موتور حل معادلات جبری)</b> است
+            که برای <b>حل معادلات</b> و <b>ساده‌سازی عبارات جبری</b> طراحی شده است.
+          </p>
+          <p>
+            هسته محاسباتی این برنامه بر پایه یک
+            <b>Expression Parser (تجزیه‌گر عبارت جبری)</b>
+            ساخته شده است که ساختار عبارت را تحلیل کرده و عملیات جبری را با دقت بیشتری انجام می‌دهد.
+          </p>
+          <p>
+            این برنامه در نسخه فعلی، روی <b>معادلات خطی تک‌متغیره</b> تمرکز دارد
+            و تلاش می‌کند نتیجه را به‌صورت ساده و مرحله‌به‌مرحله نمایش دهد.
+          </p>
+
+        </div>
+
+        <div class="help-section">
+          <h3>نحوه ورود عبارت</h3>
+          <p>
+            می‌توانید ورودی خود را به‌صورت یک <b>معادله جبری</b> یا یک
+            <b>عبارت جبری</b> وارد کنید.
+          </p>
+          <p>نمونه‌هایی از ورودی صحیح:</p>
+          <div class="example-box">2x + 3 = 7</div>
+          <div class="example-box">3(x + 2) = 9</div>
+          <div class="example-box">4x - 5 = 11</div>
+          <div class="example-box">4(x + 2)</div>
+          <div class="example-box">x+3-2(x+2x(3x+5y))</div>
+
+        </div>
+
+        <div class="help-section">
+          <h3>نوع ورودی</h3>
+          <p>
+            ورودی باید <b>یا یک معادله</b> برای حل شدن باشد،
+            یا <b>یک عبارت جبری</b> برای ساده‌سازی.
+          </p>
+          <p>
+            اگر ورودی شامل علامت <code>=</code> باشد، برنامه آن را به‌عنوان
+            <b>Equation Solving (حل معادله)</b> تشخیص می‌دهد.
+          </p>
+          <p>
+            اگر ورودی شامل علامت <code>=</code> نباشد، برنامه آن را به‌عنوان
+            <b>Expression Simplification (ساده‌سازی عبارت)</b> در نظر می‌گیرد.
+          </p>
+        </div>
+
+        <div class="help-section">
+          <h3>نکات مهم</h3>
+          <p>استفاده از فاصله در ورودی مشکلی ایجاد نمی‌کند.</p>
+          <p>نمادهای <code>×</code> و <code>÷</code> نیز پشتیبانی می‌شوند.</p>
+          <p>پرانتزها باید کامل، متوازن و به‌درستی نوشته شوند.</p>
+          <p>پرانتزهای تو‌در‌تو نیز قابل استفاده هستند.</p>
+          <p>ضرب ضمنی مانند <code>4(x+2)</code> یا <code>2x</code> نیز توسط برنامه تشخیص داده می‌شود.</p>
+          <p>عبارت یا معادله نباید ناقص باشد؛ برای مثال، نباید با <code>+</code> یا <code>=</code> پایان یابد.</p>
+          <p>در نسخه فعلی، سیستم برای معادلات خطی تک‌متغیره طراحی شده است.</p>
+          <p>
+            در برخی حالت‌ها مانند <code>4x/2x</code> ممکن است عبارت از نظر ترتیب عملیات مبهم باشد.
+            در این موارد بهتر است برای مشخص کردن ساختار، از پرانتز استفاده شود.
+          </p>
+
+        </div>
+
+        <div class="help-section">
+          <h3>دقت نمایش جواب</h3>
+          <p>
+            مقادیر عددی و جواب‌ها در خروجی معمولاً با دقت محدود و حداکثر تا
+            <b>دو رقم اعشار</b> نمایش داده می‌شوند.
+          </p>
+          <p>
+            به همین دلیل، اگر مقدار واقعی بسیار کوچک باشد، ممکن است در خروجی
+            به‌صورت <b>0</b> نمایش داده شود.
+          </p>
+          <div class="example-box">0.000004 → 0</div>
+          <p>
+            این موضوع به دلیل <b>Rounding (گرد کردن عدد)</b> در زمان نمایش خروجی است
+            و لزوماً به معنای صفر بودن واقعی مقدار نیست.
+          </p>
+        </div>
+
+        <div class="help-section">
+          <h3>محدودیت‌های برنامه</h3>
+          <p> حل معادله فقط برای <b>معادلات خطی تک‌متغیره</b> انجام می‌شود.</p>
+          <p> اگر بیش از یک متغیر مستقل در معادله وجود داشته باشد، برنامه آن را حل نمی‌کند.</p>
+          <p> معادلات درجه دوم، معادلات چندمتغیره و دستگاه معادلات در این نسخه پشتیبانی نمی‌شوند.</p>
+          <p> دقت نمایش اعداد محدود است؛ بنابراین اعداد بسیار کوچک ممکن است به‌صورت صفر نمایش داده شوند.</p>
+          <p> ورودی باید از نظر ساختار نوشتاری صحیح باشد؛ در غیر این صورت برنامه خطای ورودی نمایش می‌دهد.</p>
+        </div>
+
+        <div class="help-section">
+          <h3>نمونه ورودی نامعتبر</h3>
+          <div class="bad-example">2x + = 5</div>
+          <div class="bad-example">3(</div>
+          <div class="bad-example">2(x+3</div>
+          <div class="bad-example">+4x</div>
+          <div class="bad-example">x + y = 5</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="result"></div>
+
+    <button id="stepsBtn" class="stepsBtn" onclick="toggleSteps()">نمایش مراحل</button>
+
+    <div id="steps"></div>
+
+    <div id="error"></div>
+
+  </div>
+
+  <div class="iran-footer-bar">
+    <div class="green"></div>
+    <div class="white"></div>
+    <div class="red"></div>
+  </div>
+
+
+  <script>
+    const input = document.getElementById("input");
+    const resultDiv = document.getElementById("result");
+    const stepsDiv = document.getElementById("steps");
+    const errorDiv = document.getElementById("error");
+    const stepsBtn = document.getElementById("stepsBtn");
+
+    let steps = [];
+
+    function resetUI() {
+      steps = [];
+      stepsDiv.innerHTML = "";
+      stepsDiv.style.display = "none";
+      stepsBtn.style.display = "none";
+      errorDiv.innerHTML = "";
+      errorDiv.style.display = "none";
+      resultDiv.innerText = "";
+    }
+
+    function showError(msg) {
+      errorDiv.style.display = "block";
+      errorDiv.innerText = msg;
+    }
+
+    function smart(n) {
+      if (!Number.isFinite(n)) return n;
+      return Number.isInteger(n) ? n : Number(n.toFixed(2));
+    }
+
+    function normalize(expr) {
+      expr = expr.replace(/\s+/g, "");
+      expr = expr.replace(/×|⋅|∙/g, "*");
+      expr = expr.replace(/÷/g, "/");
+      return expr;
+    }
+
+    function validate(expr) {
+      expr = expr.replace(/\s+/g, "");
+
+      if (!expr) throw "عبارت خالی است.";
+
+      if (!/^[0-9a-zA-Z+\-*/=()<>≤≥.×÷]+$/.test(expr)) {
+        throw "کاراکتر غیرمجاز وجود دارد.";
+      }
+
+      if (/[<>≤≥]/.test(expr)) {
+        throw "نامعادله پشتیبانی نمی‌شود.";
+      }
+
+      const eqCount = (expr.match(/=/g) || []).length;
+      if (eqCount > 1) {
+        throw "بیش از یک مساوی وجود دارد.";
+      }
+
+      let balance = 0;
+      for (let ch of expr) {
+        if (ch === "(") balance++;
+        if (ch === ")") {
+          balance--;
+          if (balance < 0) throw "پرانتز اضافی وجود دارد.";
+        }
+      }
+
+      if (balance !== 0) {
+        throw "پرانتزها متوازن نیستند.";
+      }
+
+      if (/[+\-*/=]$/.test(expr)) {
+        throw "عبارت ناقص است.";
+      }
+
+      if (/^[*/=]/.test(expr)) {
+        throw "شروع عبارت نامعتبر است.";
+      }
+
+      if (/==/.test(expr)) {
+        throw "ساختار مساوی نامعتبر است.";
+      }
+    }
+
+    // ==========================================
+    // Tokenizer
+    // ==========================================
+    function tokenize(str) {
+      str = str.replace(/\s+/g, "");
+
+      // ضرب ضمنی:
+      // 2x => 2*x
+      // 2(x+1) => 2*(x+1)
+      // x(y+1) => x*(y+1)
+      // (a+b)(c+d) => (a+b)*(c+d)
+      // )x => )*x
+      str = str.replace(/(\d)([a-zA-Z])/g, "$1*$2");
+      str = str.replace(/(\d)\(/g, "$1*(");
+      str = str.replace(/([a-zA-Z])\(/g, "$1*(");
+      str = str.replace(/\)(\d|[a-zA-Z]|\()/g, ")*$1");
+
+      const tokens = [];
+      let i = 0;
+
+      while (i < str.length) {
+        const char = str[i];
+
+        if ("+-*/()".includes(char)) {
+          tokens.push({ type: "OP", value: char });
+          i++;
+        } else if (/[0-9.]/.test(char)) {
+          let num = "";
+          let dotCount = 0;
+
+          while (i < str.length && /[0-9.]/.test(str[i])) {
+            if (str[i] === ".") dotCount++;
+            num += str[i];
+            i++;
+          }
+
+          if (dotCount > 1 || num === ".") {
+            throw new Error("عدد نامعتبر است.");
+          }
+
+          tokens.push({ type: "NUM", value: parseFloat(num) });
+        } else if (/[a-zA-Z]/.test(char)) {
+          tokens.push({ type: "VAR", value: char });
+          i++;
+        } else {
+          throw new Error(`کاراکتر نامعتبر: ${char}`);
+        }
+      }
+
+      return tokens;
+    }
+
+    // ==========================================
+    // Polynomial
+    // ==========================================
+    class Polynomial {
+      constructor(terms = []) {
+        this.terms = terms;
+      }
+
+      static fromNumber(n) {
+        return new Polynomial([{ coeff: n, vars: {} }]);
+      }
+
+      static fromVariable(v) {
+        return new Polynomial([{ coeff: 1, vars: { [v]: 1 } }]);
+      }
+
+      cloneTerm(term) {
+        return {
+          coeff: term.coeff,
+          vars: { ...term.vars }
+        };
+      }
+
+      static varsKey(vars) {
+        return Object.keys(vars)
+          .filter(k => vars[k] !== 0)
+          .sort()
+          .map(k => vars[k] === 1 ? k : `${k}^${vars[k]}`)
+          .join("*");
+      }
+
+      add(other) {
+        const map = new Map();
+
+        for (const t of [...this.terms, ...other.terms]) {
+          const key = Polynomial.varsKey(t.vars);
+          if (!map.has(key)) {
+            map.set(key, { coeff: 0, vars: { ...t.vars } });
+          }
+          map.get(key).coeff += t.coeff;
+        }
+
+        return new Polynomial(
+          [...map.values()].filter(t => Math.abs(t.coeff) > 1e-12)
+        );
+      }
+
+      subtract(other) {
+        const neg = new Polynomial(
+          other.terms.map(t => ({
+            coeff: -t.coeff,
+            vars: { ...t.vars }
+          }))
+        );
+        return this.add(neg);
+      }
+
+      //2x*3x+2x*1=6x^2+2x
+
+      multiply(other) {
+        const result = new Map();
+
+        for (const t1 of this.terms) {
+          for (const t2 of other.terms) {
+            const coeff = t1.coeff * t2.coeff;
+            const vars = { ...t1.vars };
+
+            for (const [v, p] of Object.entries(t2.vars)) {
+              vars[v] = (vars[v] || 0) + p;
+            }
+
+            const key = Polynomial.varsKey(vars);
+
+            if (!result.has(key)) {
+              result.set(key, { coeff: 0, vars });
+            }
+
+            result.get(key).coeff += coeff;
+          }
+        }
+
+        return new Polynomial(
+          [...result.values()].filter(t => Math.abs(t.coeff) > 1e-12)
+        );
+      }
+
+      divideByConstant(n) {
+        if (n === 0) {
+          throw new Error("تقسیم بر صفر مجاز نیست.");
+        }
+
+        return new Polynomial(
+          this.terms.map(t => ({
+            coeff: t.coeff / n,
+            vars: { ...t.vars }
+          }))
+        );
+      }
+
+      isConstant() {
+        return this.terms.every(t => Object.keys(t.vars).length === 0);
+      }
+
+      constantValue() {
+        if (!this.isConstant()) {
+          throw new Error("عبارت ثابت نیست.");
+        }
+        return this.terms.reduce((sum, t) => sum + t.coeff, 0);
+      }
+
+      getVariables() {
+        const vars = new Set();
+        for (const term of this.terms) {
+          for (const v of Object.keys(term.vars)) vars.add(v);
+        }
+        return vars;
+      }
+
+      toLinearForm() {
+        // خروجی: { variable, a, b }
+        // ax + b
+        const vars = this.getVariables();
+
+        if (vars.size === 0) {
+          return { variable: null, a: 0, b: this.constantValue() };
+        }
+
+        if (vars.size > 1) {
+          throw new Error("چند متغیر تشخیص داده شد.");
+        }
+
+        const variable = [...vars][0];
+        let a = 0;
+        let b = 0;
+
+        for (const term of this.terms) {
+          const keys = Object.keys(term.vars);
+
+          if (keys.length === 0) {
+            b += term.coeff;
+          } else if (
+            keys.length === 1 &&
+            keys[0] === variable &&
+            term.vars[variable] === 1
+          ) {
+            a += term.coeff;
+          } else {
+            throw new Error("فقط معادله خطی تک‌متغیره پشتیبانی می‌شود.");
+          }
+        }
+
+        return { variable, a, b };
+      }
+
+      toString() {
+        if (this.terms.length === 0) return "0";
+
+        const sorted = [...this.terms].sort((a, b) => {
+          const degA = Object.values(a.vars).reduce((s, x) => s + x, 0);
+          const degB = Object.values(b.vars).reduce((s, x) => s + x, 0);
+          if (degB !== degA) return degB - degA;
+
+          const keyA = Polynomial.varsKey(a.vars);
+          const keyB = Polynomial.varsKey(b.vars);
+          return keyA.localeCompare(keyB);
+        });
+
+        let result = "";
+
+        sorted.forEach((term, index) => {
+          let coeff = smart(term.coeff);
+          if (Math.abs(coeff) < 1e-12) return;
+
+          const absCoeff = Math.abs(coeff);
+
+          let varPart = Object.keys(term.vars)
+            .sort()
+            .map(v => term.vars[v] === 1 ? v : `${v}^${term.vars[v]}`)
+            .join("");
+
+          let piece = "";
+
+          if (varPart) {
+            if (absCoeff === 1) {
+              piece = varPart;
+            } else {
+              piece = absCoeff + varPart;
+            }
+          } else {
+            piece = String(absCoeff);
+          }
+
+          if (index === 0) {
+            result += coeff < 0 ? "-" + piece : piece;
+          } else {
+            result += coeff < 0 ? " - " + piece : " + " + piece;
+          }
+        });
+
+        return result || "0";
+      }
+    }
+
+    // ==========================================
+    // Parser
+    // ==========================================
+    class Parser {
+      constructor(tokens) {
+        this.tokens = tokens;
+        this.pos = 0;
+      }
+
+      peek() {
+        return this.tokens[this.pos];
+      }
+
+      consume(expectedValue = null) {
+        const token = this.peek();
+
+        if (!token) {
+          throw new Error("پایان غیرمنتظره عبارت.");
+        }
+
+        if (expectedValue !== null && token.value !== expectedValue) {
+          throw new Error(`انتظار '${expectedValue}' وجود داشت.`);
+        }
+
+        this.pos++;
+        return token;
+      }
+
+      parse() {
+        const result = this.expr();
+
+        if (this.pos < this.tokens.length) {
+          throw new Error(`توکن اضافی: ${this.tokens[this.pos].value}`);
+        }
+
+        return result;
+      }
+
+      expr() {
+        let node = this.term();
+
+        while (true) {
+          const next = this.peek();
+
+          if (next && next.type === "OP" && (next.value === "+" || next.value === "-")) {
+            const op = this.consume().value;
+            const right = this.term();
+            node = op === "+" ? node.add(right) : node.subtract(right);
+          } else {
+            break;
+          }
+        }
+
+        return node;
+      }
+
+      term() {
+        let node = this.factor();
+
+        while (true) {
+          const next = this.peek();
+
+          if (next && next.type === "OP" && (next.value === "*" || next.value === "/")) {
+            const op = this.consume().value;
+            const right = this.factor();
+
+            if (op === "*") {
+              node = node.multiply(right);
+            } else {
+              if (!right.isConstant()) {
+                throw new Error("تقسیم فقط بر عدد ثابت پشتیبانی می‌شود.");
+              }
+              node = node.divideByConstant(right.constantValue());
+            }
+          } else {
+            break;
+          }
+        }
+
+        return node;
+      }
+
+      factor() {
+        const token = this.peek();
+
+        if (!token) {
+          throw new Error("پایان غیرمنتظره عبارت.");
+        }
+
+        if (token.type === "OP" && token.value === "-") {
+          this.consume("-");
+          return Polynomial.fromNumber(-1).multiply(this.factor());
+        }
+
+        if (token.type === "OP" && token.value === "+") {
+          this.consume("+");
+          return this.factor();
+        }
+
+        if (token.type === "NUM") {
+          this.consume();
+          return Polynomial.fromNumber(token.value);
+        }
+
+        if (token.type === "VAR") {
+          this.consume();
+          return Polynomial.fromVariable(token.value);
+        }
+
+        if (token.type === "OP" && token.value === "(") {
+          this.consume("(");
+          const node = this.expr();
+          this.consume(")");
+          return node;
+        }
+
+        throw new Error(`توکن غیرمنتظره: ${token.value}`);
+      }
+    }
+
+    function detectAmbiguousDivision(expr) {
+      const pattern = /(\d*)([a-zA-Z])\/(\d*)([a-zA-Z])/g;
+      const match = pattern.exec(expr);
+
+      if (match) {
+        const full = match[0];
+        const a = match[1] || "1";
+        const var1 = match[2];
+        const b = match[3] || "1";
+        const var2 = match[4];
+
+        let suggestion;
+
+        if (var1 === var2) {
+          suggestion = `${var1}(${a}/${b})`;
+        } else {
+          suggestion = `(${a}${var1})/(${b}${var2})`;
+        }
+
+        throw `تقسیم مبهم تشخیص داده شد: ${full}
+
+آیا منظورتان این بوده است:
+${suggestion}
+
+در صورت منظور بودن کسر جبری، لطفاً از پرانتز استفاده کنید.`;
+      }
+    }
+
+
+
+    function parsePolynomial(expr) {
+      const tokens = tokenize(expr);
+      const parser = new Parser(tokens);
+      return parser.parse();
+    }
+
+    function simplify(expr) {
+      steps.push(expr);
+      steps.push("بسط و ترکیب جملات هم‌نوع");
+
+      const poly = parsePolynomial(expr);
+      const result = poly.toString();
+
+      steps.push(result);
+      return result;
+    }
+
+    function solveEquation(eq) {
+      steps.push(eq);
+
+      const [leftRaw, rightRaw] = eq.split("=");
+
+      if (leftRaw === "" || rightRaw === "") {
+        throw "ساختار معادله نامعتبر است.";
+      }
+
+      const left = parsePolynomial(leftRaw);
+      const right = parsePolynomial(rightRaw);
+
+      steps.push("بسط و ساده‌سازی طرفین");
+      steps.push(`${left.toString()} = ${right.toString()}`);
+
+      const diff = left.subtract(right); // ax + b = 0
+      const { variable, a, b } = diff.toLinearForm();
+
+      if (!variable) {
+        if (Math.abs(b) < 1e-12) throw "بی‌نهایت جواب دارد.";
+        throw "جواب ندارد.";
+      }
+
+      // steps.push("انتقال جملات به یک طرف");
+      // steps.push(`${smart(a)}${variable} + ${smart(b)} = 0`);
+
+      if (Math.abs(a) < 1e-12) {
+        if (Math.abs(b) < 1e-12) throw "بی‌نهایت جواب دارد.";
+        throw "جواب ندارد.";
+      }
+
+      const x = smart(-b / a);
+
+      steps.push("تقسیم طرفین بر ضریب متغیر");
+      steps.push(`${variable} = ${x}`);
+
+      return `${variable} = ${x}`;
+    }
+
+    function solve() {
+      resetUI();
+
+      const value = input.value.trim();
+
+      if (!value) {
+        showError("عبارتی وارد نشده است.");
+        return;
+      }
+
+      try {
+        validate(value);
+
+        const expr = normalize(value);
+        detectAmbiguousDivision(expr)
+        let result;
+
+        if (expr.includes("=")) {
+          result = solveEquation(expr);
+        } else {
+          result = simplify(expr);
+        }
+
+        resultDiv.innerHTML = '<span dir="ltr">' + result + "</span>";
+        showSteps();
+        stepsBtn.style.display = "block";
+      } catch (e) {
+        showError(e.message || e);
+      }
+    }
+
+    function showSteps() {
+      stepsDiv.innerHTML = "";
+
+      steps.forEach(s => {
+        const div = document.createElement("div");
+        div.className = "step";
+        div.innerHTML = '<span dir="ltr">' + s + "</span>";
+        stepsDiv.appendChild(div);
+      });
+    }
+
+    function toggleSteps() {
+      stepsDiv.style.display = stepsDiv.style.display === "none" ? "block" : "none";
+    }
+
+    // =========================
+    // Modal Logic
+    // =========================
+    const helpBtn = document.getElementById("helpBtn");
+    const helpModal = document.getElementById("helpModal");
+    const closeHelp = document.getElementById("closeHelp");
+
+    function openHelpModal() {
+      helpModal.classList.remove("hide");
+      helpModal.classList.add("show");
+    }
+
+    function closeHelpModal() {
+      helpModal.classList.remove("show");
+      helpModal.classList.add("hide");
+
+      setTimeout(() => {
+        helpModal.style.display = "none";
+        helpModal.classList.remove("hide");
+      }, 220);
+    }
+
+    helpBtn.addEventListener("click", () => {
+      helpModal.style.display = "flex";
+      requestAnimationFrame(() => {
+        openHelpModal();
+      });
+    });
+
+    closeHelp.addEventListener("click", closeHelpModal);
+
+    helpModal.addEventListener("click", (e) => {
+      if (e.target === helpModal) {
+        closeHelpModal();
+      }
+    });
+
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && helpModal.classList.contains("show")) {
+        closeHelpModal();
+      }
+    });
+
+    input.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        solve();
+      }
+    });
+  </script>
+
+</body>
+
+</html>
