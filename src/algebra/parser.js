@@ -1,6 +1,6 @@
 // src/core/parser.js
-import { Polynomial } from "./Polynomial.js";
-import { Fraction } from "./Fraction.js";
+import { Polynomial } from "./polynomial.js";
+import { Fraction } from "./fraction.js";
 
 // تابع کمکی برای ساده‌سازی رادیکال‌های عددی محض
 // sqrt(12) -> 2 * sqrt(3)
