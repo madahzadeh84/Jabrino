@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="fa">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>جبرینو</title>
+
+    <!-- بارگذاری استایل و اسکریپت MathLive جهت ویرایشگر بصری فرمول‌ها -->
+    <script src="https://unpkg.com/mathlive"></script>
+
+    <link rel="stylesheet" href="./assets/styles/main.css" />
+</head>
+
+<body>
+
+    <div class="container">
+
+        <button id="helpBtn" class="help-floating-btn" type="button" aria-label="راهنمای استفاده">
+            <span>راهنما</span>
+        </button>
+
+        <button id="historyBtn" class="history-floating-btn" type="button" aria-label="تاریخچه محاسبات">
+            <span>تاریخچه</span>
+        </button>
+
+        <h1>جبرینو</h1>
+        <div class="subtitle">حل معادله و ساده‌سازی عبارت جبری</div>
+
+        <!-- فیلد ورودی ریاضی MathLive -->
+        <div class="mini-kbd" id="miniKbd">
+            <button type="button" data-action="frac">کسر</button>
+            <button type="button" data-action="power">توان</button>
+            <button type="button" data-action="sqrt">رادیکال</button>
+            <button type="button" data-action="paren">پرانتز</button>
+        </div>
+
+        <math-field id="mathInput" dir="ltr" style="direction: ltr; text-align: left;"></math-field>
+
+        <button class="solveBtn" onclick="solve()">محاسبه</button>
+
+        <!-- مودال راهنما -->
+        <div id="helpModal" class="modal">
+            <div class="modal-content">
+                <button id="closeHelp" class="close-btn" type="button" aria-label="بستن راهنما">
+                    <span>✕</span>
+                </button>
+
+                <h2>راهنمای استفاده از جبرینو</h2>
+
+                <div class="help-section">
+                    <h3>جبرینو چیست؟</h3>
+                    <p>
+                        جبرینو یک <b>Algebra Solver Engine (موتور حل معادلات جبری)</b> مبتنی بر وب است.
+                        نسخه جدید مجهز به ورودی ریاضی بصری (WYSIWYG) با خروجی لاتک و مفسر محاسبات گویای دقیق کسرها بدون
+                        افت مقدار است.
+                    </p>
+                </div>
+
+                <div class="help-section">
+                    <h3>نحوه ورود کسر و عبارات ریاضی</h3>
+                    <p>
+                        در فیلد ورودی جدید، می‌توانید فرمول‌ها را به صورت کاملاً ریاضی بنویسید.
+                    </p>
+                    <p>
+                        <b>تایپ کسر:</b> کافیست کلید <code>/</code> (یا علامت تقسیم) را روی کیبورد بزنید تا بلافاصله خط
+                        کسری افقی ایجاد شود. سپس با کلیدهای جهت‌نما بین صورت و مخرج جابجا شوید.
+                    </p>
+                    <p>
+                        <b>تایپ توان:</b> از نماد <code>^</code> استفاده کنید.
+                    </p>
+                </div>
+
+                <div class="help-section">
+                    <h3>مثال‌های معتبر</h3>
+                    <div class="example-box">3x - \frac{1}{2} = \frac{5}{4}</div>
+                    <div class="example-box">\frac{x - 2x + 4}{3} = 5</div>
+                    <div class="example-box">2(x + 3)^2</div>
+                </div>
+
+                <div class="help-section">
+                    <h3>محدودیت‌های حل کسر جبری</h3>
+                    <p>
+                        در این نسخه مخرج کسرها باید عددی باشند. تقسیم بر متغیر (کسرهای جبری مخرج‌دار نظیر
+                        <code>1/x</code>) در هسته خطی فعلی پشتیبانی نمی‌شود.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- مودال تاریخچه محاسبات -->
+        <div id="historyModal" class="modal">
+            <div class="modal-content">
+                <button id="closeHistory" class="close-btn" type="button" aria-label="بستن تاریخچه">
+                    <span>✕</span>
+                </button>
+
+                <h2>تاریخچه محاسبات</h2>
+                <div id="historyContainer"></div>
+            </div>
+        </div>
+
+        <div id="result"></div>
+        <button id="stepsBtn" class="stepsBtn" onclick="toggleSteps()">نمایش مراحل</button>
+        <div id="steps"></div>
+        <div id="error"></div>
+
+    </div>
+
+    <div class="iran-footer-bar">
+        <div class="green"></div>
+        <div class="white"></div>
+        <div class="red"></div>
+    </div>
+
+    <!-- بارگذاری به عنوان ماژول جاوااسکریپت -->
+    <script type="module" src="./src/app/main.js"></script>
+
+</body>
+
+</html>

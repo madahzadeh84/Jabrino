@@ -1,0 +1,58 @@
+/* کلاس‌های کمکی برای نوار ابزار */
+.math-toolbar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 8px;
+  justify-content: flex-start;
+}
+
+.toolbar-btn {
+  border: 1px solid #d0d5dd;
+  background: #ffffff;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.toolbar-btn:hover {
+  background: #f9fafb;
+  border-color: #98a2b3;
+}
+
+.toolbar-btn span {
+  font-weight: bold;
+  color: #2e90fa;
+}
+
+.frac-widget{
+  display: inline-grid;
+  grid-template-rows: auto 2px auto;
+  gap: 4px;
+  padding: 6px 8px;
+  margin: 0 2px;
+  border: 1px solid #d0d5dd;
+  border-radius: 10px;
+  background: #fff;
+  vertical-align: middle;
+}
+
+.frac-num, .frac-den{
+  min-width: 40px;
+  padding: 2px 6px;
+  border-radius: 8px;
+  background: #f2f4f7;
+  outline: none;
+  text-align: center;
+}
+
+.frac-bar{
+  height: 2px;
+  background: #111827;
+  border-radius: 2px;
+  opacity: .85;
+}
