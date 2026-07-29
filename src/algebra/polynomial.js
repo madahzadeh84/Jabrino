@@ -1,4 +1,4 @@
-import { Fraction } from "./Fraction.js";
+import { Fraction } from "./fraction.js";
 
 export class Polynomial {
   constructor(terms = []) {
