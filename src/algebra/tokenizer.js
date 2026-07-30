@@ -6,6 +6,7 @@ export function tokenize(str) {
   str = str.replace(/(\d)\(/g, "$1*(");     // 2(x+1) -> 2*(x+1)
   str = str.replace(/\)(\d)/g, ")*$1");     // (x+1)2 -> (x+1)*2
 
+  
   const tokens = [];
   let i = 0;
 

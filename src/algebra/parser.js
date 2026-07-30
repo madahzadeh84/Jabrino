@@ -85,27 +85,39 @@ export class Parser {
     return node;
   }
 
-  term() {
-    let node = this.power();
-    while (true) {
-      const next = this.peek();
-      if (next && next.type === "OP" && (next.value === "*" || next.value === "/")) {
-        const op = this.consume().value;
-        const right = this.power();
-        if (op === "*") {
-          node = node.multiply(right);
-        } else {
-          if (!right.isConstant()) {
-            throw new Error("تقسیم بر عبارتی که شامل متغیر است پشتیبانی نمی‌شود.");
-          }
-          node = node.divideByConstant(right.constantValue());
-        }
+term() {
+  let node = this.power();
+
+  while (true) {
+    const next = this.peek();
+
+    if (next && next.type === "OP" && (next.value === "*" || next.value === "/")) {
+      // ضرب یا تقسیم صریح
+      const op = this.consume().value;
+      const right = this.power();
+
+      if (op === "*") {
+        node = node.multiply(right);
       } else {
-        break;
+        if (!right.isConstant()) {
+          throw new Error("تقسیم بر عبارتی که شامل متغیر است پشتیبانی نمی‌شود.");
+        }
+        node = node.divideByConstant(right.constantValue());
       }
     }
-    return node;
+    // --- اضافه کردن ضرب ضمنی: NUM VAR / VAR NUM / VAR VAR / NUM ( ... ) / ( ... ) NUM ---
+    else if (next && (next.type === "NUM" || next.type === "VAR" || (next.type === "OP" && next.value === "("))) {
+      // اینجا ستاره را ضمنی در نظر می‌گیریم
+      const right = this.power();
+      node = node.multiply(right);
+    } else {
+      break;
+    }
   }
+
+  return node;
+}
+
 
   power() {
     let node = this.factor();

@@ -10,7 +10,9 @@ import {
   normalizeMathInput,
   rejectFractionalExponents,
 } from "../core/validate.js";
-import { solveEquation, simplify } from "../algebra/solveEquation.js";
+// import { solveEquation, simplify } from "../algebra/solveEquation.js";
+import { solveEquation } from "../algebra/solveEquation.js";
+import { simplify } from "../algebra/simplify.js";
 import { evalNumeric } from "../core/numericEval.js";
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -26,33 +28,110 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function resetUI() {
     steps = [];
+    stepsVisible = false;
     stepsDiv.innerHTML = "";
     stepsDiv.style.display = "none";
     stepsBtn.style.display = "none";
+    stepsBtn.textContent = "نمایش مراحل";
+    stepsBtn.disabled = true;
     errorDiv.innerHTML = "";
     errorDiv.style.display = "none";
     resultDiv.innerHTML = "";
   }
 
-  function showError(msg) {
+
+  function showError(message) {
+    errorDiv.innerHTML = "";
     errorDiv.style.display = "block";
-    errorDiv.innerText = msg;
+
+    const box = document.createElement("div");
+    box.className = "error-box";
+    box.textContent = message;
+    errorDiv.appendChild(box);
   }
 
+  // نمایش گام‌ها بر اساس steps جهانی
   function showSteps() {
     stepsDiv.innerHTML = "";
-    steps.forEach((s) => {
+    if (!steps || steps.length === 0) {
+      stepsDiv.style.display = "none";
+      return;
+    }
+
+    steps.forEach((step, index) => {
       const div = document.createElement("div");
-      div.className = "step";
-      div.innerHTML = '<span dir="ltr">' + s + "</span>";
+      const kind = step.kind || "info";
+      div.className = "step step-" + kind;
+
+      const title = step.title || `گام ${index + 1}`;
+      const desc = step.description || "";
+      const from = step.from || "";
+      const to = step.to || "";
+
+      div.innerHTML = `
+        <div class="step-header">
+          <span class="step-index">گام ${index + 1}</span>
+          <span class="step-title">${title}</span>
+          <span class="step-kind-label">${kind}</span>
+        </div>
+        <div class="step-body">
+          <div class="step-text" dir="rtl">
+            ${
+              desc
+                ? `<p class="step-desc">${desc.replace(
+                    /\n/g,
+                    "<br>"
+                  )}</p>`
+                : ""
+            }
+          </div>
+          <div class="step-math" dir="ltr">
+            ${
+              from
+                ? `<div class="step-eq step-from"><span class="eq-label">از:</span> ${from}</div>`
+                : ""
+            }
+            ${
+              to
+                ? `<div class="step-eq step-to"><span class="eq-label">به:</span> ${to}</div>`
+                : ""
+            }
+          </div>
+        </div>
+      `;
       stepsDiv.appendChild(div);
     });
+
+    // وقتی گام داریم، پنل مراحل را نشان بده
+    stepsDiv.style.display = "block";
   }
 
+  let stepsVisible = false;
+
   window.toggleSteps = function () {
-    stepsDiv.style.display =
-      stepsDiv.style.display === "none" ? "block" : "none";
+    if (!steps || steps.length === 0) {
+      // اگر گامی نداریم، کاری نکن
+      return;
+    }
+
+    if (!stepsVisible) {
+      // اولین بار: رندر و نمایش
+      showSteps();
+      stepsVisible = true;
+      stepsDiv.style.display = "block";
+      stepsBtn.textContent = "مخفی‌سازی مراحل";
+    } else {
+      // بعدی‌ها: فقط hide/show
+      if (stepsDiv.style.display === "none") {
+        stepsDiv.style.display = "block";
+        stepsBtn.textContent = "مخفی‌سازی مراحل";
+      } else {
+        stepsDiv.style.display = "none";
+        stepsBtn.textContent = "نمایش مراحل";
+      }
+    }
   };
+
 
   window.solve = function () {
     resetUI();
@@ -64,16 +143,20 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     try {
+      // ۱. تبدیل LaTeX به رشتهٔ خطی (linear notation)
       const linearNormalized = MathAdapter.latexToLinear(rawLatex);
       console.log("Linearized Formula:", linearNormalized);
 
+      // ۲. نرمال‌سازی و اعتبارسنجی عبارت خطی
       let expr = normalize(linearNormalized);
       expr = normalizeMathInput(expr);
       expr = validate(expr);
 
+      // ۳. رد توان‌های کسری و تشخیص تقسیم مبهم
       rejectFractionalExponents(expr);
       detectAmbiguousDivision(expr);
 
+      // ۴. حل معادله یا ساده‌سازی عبارت
       let result;
       if (expr.includes("=")) {
         result = solveEquation(expr, steps);
@@ -81,6 +164,7 @@ document.addEventListener("DOMContentLoaded", () => {
         result = simplify(expr, steps);
       }
 
+      // ۵. نمایش نتیجه جبری با MathLive
       resultDiv.innerHTML = "";
       const resultViewer = document.createElement("math-field");
       resultViewer.setAttribute("read-only", "true");
@@ -95,6 +179,7 @@ document.addEventListener("DOMContentLoaded", () => {
       resultViewer.value = latexResult;
       resultDiv.appendChild(resultViewer);
 
+      // ۶. تقریب عددی (در صورت امکان)
       try {
         if (typeof evalNumeric === "function") {
           const numericVal = evalNumeric(expr);
@@ -111,10 +196,13 @@ document.addEventListener("DOMContentLoaded", () => {
       } catch (err) {
         console.warn("Numeric eval failed:", err);
       }
-
+      // ۷. ثبت در تاریخچه
       history.addToHistory(rawLatex, result);
-      showSteps();
-      stepsBtn.style.display = "block";
+
+      // ۸. فقط دکمه‌ی نمایش مراحل را آماده کن، بدون نمایش خودکار مراحل
+      stepsBtn.style.display = "inline-block";
+      stepsBtn.disabled = false;
+      stepsDiv.style.display = "none";
     } catch (e) {
       showError(e.message || e);
     }

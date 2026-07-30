@@ -1,3 +1,5 @@
+//src/ui/HistoryManager.js
+
 export class HistoryManager {
   constructor(key = "jabrino_calculations_history") {
     this.key = key;

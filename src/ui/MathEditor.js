@@ -28,75 +28,136 @@ export class MathEditor {
       this.toolbar.addEventListener("click", (e) => this.handleToolbarClick(e));
     }
   }
-  setupJabrinoKeyboard() {
-    try {
-      if (typeof window.mathVirtualKeyboard === "undefined") return;
 
-      const JABRINO_LAYOUT = {
-        label: "جبرینو",
-        tooltip: "کیبورد اختصاصی جبرینو",
-        // تعریف لایه‌ها (Layers/Tabs) به صورت مجزا
-        layers: [
-          // ۱. لایه اول: تب ریاضی (اعداد و نمادهای اصلی)
-          {
-            label: "ریاضی", // نام تب اول
-            rows: [
-              [
-                { latex: "\\frac{#?}{#?}", label: "کسر" },
-                { latex: "#?^{#?}", label: "توان" },
-                { latex: "\\sqrt{#?}", label: "رادیکال" },
-                { latex: "(" }, { latex: ")" }, { latex: "=" }
-              ],
-              [
-                { latex: "x" }, { latex: "y" }, { latex: "z" },
-                { latex: "+" }, { latex: "-" },
-                { latex: "\\cdot", label: "×" },
-                { latex: "\\div", label: "÷" }
-              ],
-              [
-                { latex: "7" }, { latex: "8" }, { latex: "9" },
-                { latex: "4" }, { latex: "5" }, { latex: "6" },
-                { latex: "1" }, { latex: "2" }, { latex: "3" },
-                { latex: "0" }, { latex: "." },
-                { command: "deleteBackward", label: "⌫" }
-              ],
-              [
-                { command: "moveToPreviousChar", label: "◀" },
-                { command: "moveToNextChar", label: "▶" },
-                { command: "hideVirtualKeyboard", label: "بستن" }
-              ]
-            ]
-          },
-          // ۲. لایه دوم: تب حروف انگلیسی (ABC)
-          {
-            label: "abc", // نام تب دوم
-            rows: [
-              [
-                { latex: "q" }, { latex: "w" }, { latex: "e" }, { latex: "r" }, { latex: "t" }, { latex: "y" }, { latex: "u" }, { latex: "i" }, { latex: "o" }, { latex: "p" }
-              ],
-              [
-                { latex: "a" }, { latex: "s" }, { latex: "d" }, { latex: "f" }, { latex: "g" }, { latex: "h" }, { latex: "j" }, { latex: "k" }, { latex: "l" }
-              ],
-              [
-                { latex: "z" }, { latex: "x" }, { latex: "c" }, { latex: "v" }, { latex: "b" }, { latex: "n" }, { latex: "m" },
-                { command: "deleteBackward", label: "⌫" }
-              ],
-              [
-                { command: "moveToPreviousChar", label: "◀" },
-                { command: "moveToNextChar", label: "▶" },
-                { command: "hideVirtualKeyboard", label: "بستن" }
-              ]
-            ]
-          }
-        ]
-      };
+setupJabrinoKeyboard() {
+  try {
+    if (typeof window.mathVirtualKeyboard === "undefined") return;
 
-      // جایگزین کردن چیدمان (Layout) اختصاصی ما به جای کیبورد پیش‌فرض
-      window.mathVirtualKeyboard.layouts = [JABRINO_LAYOUT];
-    } catch (err) {
-      console.warn("MathLive keyboard customization failed:", err);
-    }
+    // --- کیبورد ریاضی: "علامت‌های ریاضی" ---
+    const MATH_LAYOUT = {
+      name: "jabrino-math",
+      label: "علامت‌های ریاضی",
+      tooltip: "کلیدهای ریاضی جبرینو",
+
+      rows: [
+        // ردیف ۱: اعداد + نقطه اعشار + پاک‌کن
+        [
+          { latex: "1", label: "1" },
+          { latex: "2", label: "2" },
+          { latex: "3", label: "3" },
+          { latex: "4", label: "4" },
+          { latex: "5", label: "5" },
+          { latex: "6", label: "6" },
+          { latex: "7", label: "7" },
+          { latex: "8", label: "8" },
+          { latex: "9", label: "9" },
+          { latex: "0", label: "0" },
+          { latex: ".", label: "." },
+          { command: "deleteBackward", label: "⌫" },
+        ],
+
+        // ردیف ۲: عملگرها + پرانتز + مساوی
+        [
+          { latex: "+", label: "+" },
+          { latex: "-", label: "−" },
+          { latex: "\\cdot", label: "×" },
+          { latex: "\\div", label: "÷" },
+          { latex: "(", label: "(" },
+          { latex: ")", label: ")" },
+          { latex: "=", label: "=" },
+        ],
+
+        // ردیف ۳: ساختارهای جبری + متغیرها
+        [
+          { latex: "\\frac{#?}{#?}", label: "کسر" },   // کسر
+          { latex: "#?^{#?}", label: "توان" },           // توان
+          { latex: "\\sqrt{#?}", label: "√" },         // رادیکال
+          { latex: "x", label: "x" },
+          { latex: "y", label: "y" },
+          { latex: "z", label: "z" },
+        ],
+
+        // ردیف ۴: حرکت مکان‌نما + بستن کیبورد
+        [
+          { command: "moveToPreviousChar", label: "◀" },
+          { command: "moveToNextChar", label: "▶" },
+          { command: "hideVirtualKeyboard", label: "Close" },
+        ],
+      ],
+    };
+
+    // --- کیبورد حروف انگلیسی: "حروف انگلیسی" ---
+    const LETTERS_LAYOUT = {
+      name: "jabrino-abc",
+      label: "حروف انگلیسی",
+      tooltip: "حروف انگلیسی برای متغیرها",
+
+      rows: [
+        // ردیف ۱: اعداد + پاک‌کن
+        [
+          { insert: "1", label: "1" },
+          { insert: "2", label: "2" },
+          { insert: "3", label: "3" },
+          { insert: "4", label: "4" },
+          { insert: "5", label: "5" },
+          { insert: "6", label: "6" },
+          { insert: "7", label: "7" },
+          { insert: "8", label: "8" },
+          { insert: "9", label: "9" },
+          { insert: "0", label: "0" },
+          { command: "deleteBackward", label: "⌫" },
+        ],
+
+        // ردیف ۲: QWERTY
+        [
+          { insert: "q", label: "q" },
+          { insert: "w", label: "w" },
+          { insert: "e", label: "e" },
+          { insert: "r", label: "r" },
+          { insert: "t", label: "t" },
+          { insert: "y", label: "y" },
+          { insert: "u", label: "u" },
+          { insert: "i", label: "i" },
+          { insert: "o", label: "o" },
+          { insert: "p", label: "p" },
+        ],
+
+        // ردیف ۳: ASDF
+        [
+          { insert: "a", label: "a" },
+          { insert: "s", label: "s" },
+          { insert: "d", label: "d" },
+          { insert: "f", label: "f" },
+          { insert: "g", label: "g" },
+          { insert: "h", label: "h" },
+          { insert: "j", label: "j" },
+          { insert: "k", label: "k" },
+          { insert: "l", label: "l" },
+        ],
+
+        // ردیف ۴: ZXCV + Space + بستن
+        [
+          { insert: "z", label: "z" },
+          { insert: "x", label: "x" },
+          { insert: "c", label: "c" },
+          { insert: "v", label: "v" },
+          { insert: "b", label: "b" },
+          { insert: "n", label: "n" },
+          { insert: "m", label: "m" },
+          { insert: " ", label: "Space" },
+          { command: "hideVirtualKeyboard", label: "Close" },
+        ],
+      ],
+    };
+
+    window.mathVirtualKeyboard.layouts = [MATH_LAYOUT, LETTERS_LAYOUT];
+  } catch (err) {
+    console.warn("MathLive keyboard customization failed:", err);
   }
+}
+
+
+
 
   handleToolbarClick(e) {
     const btn = e.target.closest("button[data-action]");

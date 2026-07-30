@@ -1,3 +1,5 @@
+//src/core/normalize.js
+
 export function normalize(expr) {
   expr = expr.replace(/\s+/g, "");
   expr = expr.replace(/×|&times;|⋅|∙/g, "*");

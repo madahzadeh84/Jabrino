@@ -101,10 +101,12 @@
         </div>
 
         <div id="result"></div>
-        <button id="stepsBtn" class="stepsBtn" onclick="toggleSteps()">نمایش مراحل</button>
+        <button id="stepsBtn" onclick="toggleSteps()" style="display:none">
+            نمایش مراحل
+        </button>
+
         <div id="steps"></div>
         <div id="error"></div>
-
     </div>
 
     <div class="iran-footer-bar">
@@ -112,6 +114,7 @@
         <div class="white"></div>
         <div class="red"></div>
     </div>
+
 
     <!-- بارگذاری به عنوان ماژول جاوااسکریپت -->
     <script type="module" src="./src/app/main.js"></script>

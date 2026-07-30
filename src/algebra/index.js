@@ -1,3 +1,5 @@
+//src/algebra/index.js
+
 import { simplify } from "./simplify.js";
 import { solveEquation } from "./solveEquation.js";
 

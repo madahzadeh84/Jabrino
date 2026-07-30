@@ -1,3 +1,5 @@
+//src/algebra/polynomial.js
+
 import { Fraction } from "./fraction.js";
 
 export class Polynomial {

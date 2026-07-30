@@ -24,6 +24,7 @@ math-field {
 }
 
 * {
+  font-family: "Vazirmatn", "IranSans", Tahoma, sans-serif;
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -519,3 +520,408 @@ button {
 /* math-field::part(virtual-keyboard-toggle) {
   display: none !important;
 } */
+
+/* خود کیبورد کلی */
+math-field::part(virtual-keyboard) {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Vazirmatn", sans-serif;
+  direction: ltr;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+/* سناریو ۱: اگر row خودش part دارد (مثلاً virtual-keyboard-row یا layer-row) */
+math-field::part(virtual-keyboard-row),
+math-field::part(layer-row),
+math-field::part(layer) {
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+/* سناریو ۲: اگر ردیف‌ها فقط کلاس دارند (مثلاً ML__virtual-keyboard-row) */
+math-field::part(virtual-keyboard) .ML__virtual-keyboard-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+/* خود کلیدها */
+math-field::part(virtual-keyboard-key) {
+  flex: 1 1 0;          /* همه کلیدها هم‌عرض شوند */
+  min-width: 0;
+  padding: 6px 4px;
+  margin: 0;
+  border-radius: 6px;
+  background: #2b2b30;
+  border: 1px solid #444;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+}
+
+/* کلیدهای کنترلی کمی باریک‌تر */
+math-field::part(virtual-keyboard-key).ML__backspace,
+math-field::part(virtual-keyboard-key).ML__hide {
+  flex: 0.8 1 0;
+  background: #38383d;
+}
+
+#steps {
+  margin-top: 18px;
+  text-align: right;
+  display: none;
+}
+
+/* کانتینر هر گام */
+.step {
+  background: #f0fdf4;
+  border-right: 4px solid var(--green-main);
+  padding: 10px 12px;
+  margin-top: 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.8;
+  border-left: 4px solid var(--red-soft);
+}
+
+/* هدر گام: شماره + تیتر */
+.step-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 6px;
+}
+
+.step-index {
+  font-weight: 700;
+  color: #047857;
+}
+
+.step-title {
+  font-weight: 600;
+  color: #111827;
+}
+
+/* متن توضیح */
+.step-desc {
+  margin: 4px 0;
+  color: #374151;
+}
+
+/* جعبه before/after (فرم خطی) */
+.step-eqs {
+  margin-top: 6px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  font-family: monospace;
+  font-size: 13px;
+}
+
+.step-eq {
+  margin: 2px 0;
+}
+
+/* برچسب‌های بصری برای قبل/بعد */
+.step-from::before {
+  content: "قبل: ";
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.step-to::before {
+  content: "بعد: ";
+  font-weight: 600;
+  color: #6b7280;
+}
+
+/* رنگ‌بندی بر اساس نوع گام */
+.step-info {
+  border-right-color: #60a5fa;
+}
+
+.step-transform {
+  border-right-color: #fbbf24;
+}
+
+.step-solution {
+  border-right-color: #22c55e;
+  background: #dcfce7;
+}
+
+   .step-text {
+     direction: rtl;
+     text-align: right;
+     margin-bottom: 6px;
+   }
+   .step-math {
+     direction: ltr;
+     text-align: left;
+     padding: 6px 8px;
+     border-radius: 6px;
+     background: #ecfdf5;
+     border: 1px solid #a7f3d0;
+     font-family: monospace;
+     font-size: 13px;
+   }
+
+/* ظرف کلی گام */
+.step {
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+}
+
+/* نوع‌ها */
+.step-info {
+  border-color: #e5e7eb;
+  background: #f9fafb;
+}
+.step-transform {
+  border-color: #bfdbfe;
+  background: #eff6ff;
+}
+.step-solution {
+  border-color: #34d399;
+  background: #ecfdf5;
+}
+
+/* هدر گام */
+.step-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  font-size: 12px;
+}
+.step-index {
+  color: #6b7280;
+}
+.step-title {
+  font-weight: 600;
+  color: #111827;
+}
+.step-kind-label {
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: #e5e7eb;
+  color: #374151;
+}
+
+/* بدنه گام: متن فارسی و ریاضی جدا */
+.step-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.step-text {
+  direction: rtl;
+  text-align: right;
+  font-size: 13px;
+  color: #374151;
+}
+
+.step-math {
+  direction: ltr;
+  text-align: left;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: #f3f4f6;
+  border: 1px dashed #d1d5db;
+  font-family: "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+  font-size: 13px;
+  color: #111827;
+}
+
+/* سطرهای معادله داخل بخش ریاضی */
+.step-eq {
+  margin-bottom: 4px;
+}
+.step-eq:last-child {
+  margin-bottom: 0;
+}
+
+.eq-label {
+  display: inline-block;
+  min-width: 24px;
+  margin-right: 4px;
+  font-size: 11px;
+  color: #6b7280;
+}
+.step {
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  font-family: "Vazirmatn", system-ui, sans-serif;
+}
+
+.step-body {
+  display: flex;              /* دوتا ستون کنار هم */
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.step-text {
+  flex: 1;
+  direction: rtl;
+  text-align: right;
+}
+
+.step-math {
+  flex: 1;
+  direction: ltr;
+  text-align: left;
+}
+
+/* اگر می‌خواهی ستون ریاضی کمی باریک‌تر باشد: */
+.step-math {
+  flex: 0 0 40%;
+}
+.step-text {
+  flex: 0 0 60%;
+}
+
+/* برای این‌که فونت عددی تمیز باشد، می‌توانی از فونت لاتین جدا استفاده کنی: */
+.step-math {
+  font-family: "LatinMathFont", "STIX Two Math", "Cambria Math", serif;
+}
+.result-explanation {
+  font-size: 0.9rem;
+  color: #4b5563;
+  text-align: right;
+}
+
+
+
+
+
+
+
+/* container اصلی مراحل */
+#steps {
+  margin-top: 1rem;
+  border-radius: 16px;
+}
+
+/* هر گام */
+.jabrino-step {
+  direction: rtl;
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e3e8ef;
+  padding: 0.9rem 1rem;
+  margin-bottom: 0.75rem;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "IRANSans", sans-serif;
+}
+
+/* رنگ‌های متمایز بر اساس نوع گام */
+.jabrino-step--info {
+  border-color: #e5f0ff;
+  background: #f7fbff;
+}
+
+.jabrino-step--transform {
+  border-color: #ffe7c2;
+  background: #fffaf2;
+}
+
+.jabrino-step--solution {
+  border-color: #c9f5d5;
+  background: #f4fff7;
+}
+
+/* بالای کارت: عنوان و برچسب نوع گام */
+.jabrino-step-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.4rem;
+}
+
+.jabrino-step-title {
+  display: flex;
+  flex-direction: column;
+}
+
+.jabrino-step-kind {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.jabrino-step-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.jabrino-step-tag {
+  font-size: 0.7rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  color: #6b7280;
+  background: #f9fafb;
+}
+
+/* بدنه: متن فارسی + بخش ریاضی جدا */
+.jabrino-step-body {
+  display: flex;
+  gap: 0.8rem;
+  margin-top: 0.35rem;
+}
+
+/* متن فارسی (RTL) */
+.jabrino-step-text {
+  flex: 2;
+  font-size: 0.8rem;
+  line-height: 1.7;
+  color: #4b5563;
+}
+
+/* بخش ریاضی (LTR، فونت مونو) */
+.jabrino-step-math {
+  flex: 1.4;
+  direction: ltr;
+  text-align: left;
+  font-family: "SF Mono", ui-monospace, Menlo, Monaco, Consolas, "Courier New", monospace;
+  font-size: 0.85rem;
+  color: #111827;
+}
+
+.jabrino-step-math-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-top: 0.15rem;
+}
+
+.jabrino-step-math-label {
+  color: #6b7280;
+  font-size: 0.75rem;
+  margin-right: 0.5rem;
+}
+
+.jabrino-step-math-expr {
+  flex: 1;
+  text-align: right;
+}
+
+/* واکنش‌گرا برای موبایل */
+@media (max-width: 640px) {
+  .jabrino-step-body {
+    flex-direction: column;
+  }
+
+  .jabrino-step-math {
+    text-align: right;
+  }
+}
