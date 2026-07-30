@@ -21,6 +21,16 @@ export function validate(expr) {
 
   if (!expr) throw new Error("عبارت خالی است.");
 
+  // ۱. جلوگیری از نقطه‌های پی‌درپی (مانند 3x..4)
+  if (/\.{2,}/.test(expr)) {
+    throw new Error("استفاده از چند نقطه پی‌درپی (..) مجاز نیست.");
+  }
+
+  // ۲. جلوگیری از نقطه چسبیده به متغیر (مانند 3x.3 یا x.5)
+  if (/[a-zA-Z]\.|\.[a-zA-Z]/.test(expr)) {
+    throw new Error("نقطه (.) فقط برای اعداد اعشاری است. برای ضرب از علامت × استفاده کنید.");
+  }
+
   // Only ASCII linear chars (NO backslash)
   if (!/^[0-9a-zA-Z+\-*/=()^.]+$/.test(expr)) {
     throw new Error("کاراکتر غیرمجاز وجود دارد.");
@@ -65,7 +75,7 @@ export function rejectFractionalExponents(expr) {
 
   if (unsupported.length > 0) {
     throw new Error(
-      "توانِ کسری (Fractional Exponent) فعلاً توسط موتور محاسباتی پشتیبانی نمی‌شود."
+      "توانِ کسری فعلاً توسط موتور محاسباتی پشتیبانی نمی‌شود."
     );
   }
 }

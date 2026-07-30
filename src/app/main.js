@@ -23,6 +23,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const stepsDiv = document.getElementById("steps");
   const errorDiv = document.getElementById("error");
   const stepsBtn = document.getElementById("stepsBtn");
+  if (!resultDiv || !stepsDiv || !errorDiv || !stepsBtn) {
+    console.error("Required UI elements are missing.");
+    return;
+  }
 
   let steps = [];
 
@@ -39,7 +43,6 @@ document.addEventListener("DOMContentLoaded", () => {
     resultDiv.innerHTML = "";
   }
 
-
   function showError(message) {
     errorDiv.innerHTML = "";
     errorDiv.style.display = "block";
@@ -51,8 +54,64 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // نمایش گام‌ها بر اساس steps جهانی
+  function getKindLabel(kind) {
+    switch (kind) {
+      case "info":
+        return "معرفی";
+      case "identity":
+        return "اتحاد";
+      case "expand":
+        return "بسط";
+      case "combine":
+        return "ساده‌سازی";
+      case "solution":
+        return "نتیجه";
+      case "transform":
+        return "تبدیل";
+      case "warning":
+        return "هشدار";
+      default:
+        return kind || "مرحله";
+    }
+  }
+
+  function escapeHtml(str) {
+    return String(str || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  }
+
+  function renderMathBlock(step) {
+    const from = step.from || "";
+    const to = step.to || "";
+    const value = step.value || "";
+    const preview = step.meta?.preview || "";
+
+    if (from || to) {
+      return `
+      ${from ? `<div class="step-eq step-from"><span class="eq-label">از:</span> <span class="eq-expr">${escapeHtml(from)}</span></div>` : ""}
+      ${to ? `<div class="step-eq step-to"><span class="eq-label">به:</span> <span class="eq-expr">${escapeHtml(to)}</span></div>` : ""}
+    `;
+    }
+
+    const shown = value || preview;
+
+    if (shown) {
+      return `
+      <div class="step-eq step-value">
+        <span class="eq-label">عبارت:</span>
+        <span class="eq-expr">${escapeHtml(shown)}</span>
+      </div>
+    `;
+    }
+
+    return `<div class="step-empty">—</div>`;
+  }
+
   function showSteps() {
     stepsDiv.innerHTML = "";
+
     if (!steps || steps.length === 0) {
       stepsDiv.style.display = "none";
       return;
@@ -60,49 +119,35 @@ document.addEventListener("DOMContentLoaded", () => {
 
     steps.forEach((step, index) => {
       const div = document.createElement("div");
-      const kind = step.kind || "info";
-      div.className = "step step-" + kind;
 
+      const kind = step.kind || step.type || "info";
+      const kindLabel = getKindLabel(kind);
       const title = step.title || `گام ${index + 1}`;
       const desc = step.description || "";
-      const from = step.from || "";
-      const to = step.to || "";
+
+      div.className = "step step-" + kind;
 
       div.innerHTML = `
-        <div class="step-header">
-          <span class="step-index">گام ${index + 1}</span>
-          <span class="step-title">${title}</span>
-          <span class="step-kind-label">${kind}</span>
+      <div class="step-header">
+        <span class="step-index">گام ${index + 1}</span>
+        <span class="step-title">${escapeHtml(title)}</span>
+        <span class="step-kind-label">${escapeHtml(kindLabel)}</span>
+      </div>
+
+      <div class="step-body">
+        <div class="step-text" dir="rtl">
+          ${desc ? `<p class="step-desc">${escapeHtml(desc).replace(/\n/g, "<br>")}</p>` : ""}
         </div>
-        <div class="step-body">
-          <div class="step-text" dir="rtl">
-            ${
-              desc
-                ? `<p class="step-desc">${desc.replace(
-                    /\n/g,
-                    "<br>"
-                  )}</p>`
-                : ""
-            }
-          </div>
-          <div class="step-math" dir="ltr">
-            ${
-              from
-                ? `<div class="step-eq step-from"><span class="eq-label">از:</span> ${from}</div>`
-                : ""
-            }
-            ${
-              to
-                ? `<div class="step-eq step-to"><span class="eq-label">به:</span> ${to}</div>`
-                : ""
-            }
-          </div>
+
+        <div class="step-math" dir="ltr">
+          ${renderMathBlock(step)}
         </div>
-      `;
+      </div>
+    `;
+
       stepsDiv.appendChild(div);
     });
 
-    // وقتی گام داریم، پنل مراحل را نشان بده
     stepsDiv.style.display = "block";
   }
 
@@ -131,7 +176,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
   };
-
 
   window.solve = function () {
     resetUI();

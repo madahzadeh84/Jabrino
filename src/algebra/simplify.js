@@ -177,7 +177,7 @@ export function simplify(expr, steps = []) {
     addTransformStep(steps, {
       title: "ترکیب جملات هم‌نوع",
       description:
-        "پس از بسط، جمله‌های هم‌نوع با هم ترکیب می‌شوند تا عبارت به فرم ساده‌تر و استاندارد برسد.",
+        "پس از بسط، جمله‌های هم‌نوع (Like Terms | جملات هم‌نوع) با هم ترکیب می‌شوند تا عبارت به فرم ساده‌تر و استاندارد برسد.",
       from: lastTransformTo,
       to: result,
       meta: {
@@ -188,7 +188,7 @@ export function simplify(expr, steps = []) {
     addTransformStep(steps, {
       title: "بسط و ترکیب جملات هم‌نوع",
       description:
-        "عبارت با استفاده از موتور چندجمله‌ای بسط داده شده و سپس جمله‌های هم‌نوع با هم ترکیب می‌شوند.",
+        "عبارت با استفاده از موتور چندجمله‌ای (Polynomial Engine | موتور چندجمله‌ای) بسط داده شده و سپس جمله‌های هم‌نوع با هم ترکیب می‌شوند.",
       from: expr,
       to: result,
       meta: {
@@ -199,7 +199,7 @@ export function simplify(expr, steps = []) {
 
   addSolutionStep(steps, {
     description:
-      "این عبارت، فرم نهایی و ساده‌شده بعد از اعمال تبدیل‌های جبری است.",
+      "این عبارت، فرم نهایی و ساده‌شده (Simplified Form | فرم ساده‌شده) بعد از اعمال تبدیل‌های جبری است.",
     value: result,
     meta: {
       identitiesCount: identities.length,

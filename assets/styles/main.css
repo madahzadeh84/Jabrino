@@ -925,3 +925,108 @@ math-field::part(virtual-keyboard-key).ML__hide {
     text-align: right;
   }
 }
+.steps-container {
+  margin-top: 16px;
+}
+
+.step {
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 12px;
+  background: #fff;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+}
+
+.step-info {
+  border-right: 5px solid #3b82f6;
+}
+
+.step-transform,
+.step-expand,
+.step-combine,
+.step-identity {
+  border-right: 5px solid #8b5cf6;
+}
+
+.step-solution {
+  border-right: 5px solid #10b981;
+  background: #f0fdf4;
+}
+
+.step-header {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.step-index {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.step-title {
+  font-weight: 700;
+  color: #111827;
+  flex: 1;
+}
+
+.step-kind-label {
+  font-size: 12px;
+  background: #f3f4f6;
+  color: #374151;
+  border-radius: 999px;
+  padding: 4px 10px;
+}
+
+.step-body {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 12px;
+}
+
+.step-text {
+  color: #1f2937;
+  line-height: 1.9;
+}
+
+.step-desc {
+  margin: 0;
+  white-space: normal;
+}
+
+.step-math {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 12px;
+  font-family: "Consolas", "Courier New", monospace;
+  font-size: 14px;
+}
+
+.step-eq {
+  margin-bottom: 8px;
+}
+
+.eq-label {
+  font-weight: 700;
+  color: #475569;
+  margin-right: 6px;
+}
+
+.eq-expr {
+  color: #0f172a;
+  word-break: break-word;
+}
+
+.step-empty {
+  color: #94a3b8;
+}
+
+@media (max-width: 768px) {
+  .step-body {
+    grid-template-columns: 1fr;
+  }
+}
