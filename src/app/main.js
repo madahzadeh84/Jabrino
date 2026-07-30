@@ -1,22 +1,19 @@
 // src/app/main.js
 
 import { MathEditor } from "../ui/MathEditor.js";
-import { MathAdapter } from "../ui/MathAdapter.js"; // مسیر صحیح پس از تفکیک ماژول‌ها
+import { MathAdapter } from "../ui/MathAdapter.js";
 import { HistoryManager } from "../ui/HistoryManager.js";
 import { normalize } from "../core/normalize.js";
 import {
   validate,
   detectAmbiguousDivision,
   normalizeMathInput,
-  rejectFractionalExponents, // گارد توان کسری
+  rejectFractionalExponents,
 } from "../core/validate.js";
 import { solveEquation, simplify } from "../algebra/solveEquation.js";
-
-// اگر numericEval را ساخته‌ای:
-import { evalNumeric } from "../core/numericEval.js"; // ← در صورت نیاز، در ابتدای کار می‌توانی این را موقتاً کامنت کنی
+import { evalNumeric } from "../core/numericEval.js";
 
 document.addEventListener("DOMContentLoaded", () => {
-  // نمونه‌سازی از ادیتور و تاریخچه
   const editor = new MathEditor("mathInput", "miniKbd");
   const history = new HistoryManager();
 
@@ -52,13 +49,11 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // نمایش/مخفی‌کردن مراحل
   window.toggleSteps = function () {
     stepsDiv.style.display =
       stepsDiv.style.display === "none" ? "block" : "none";
   };
 
-  // تابع اصلی حل
   window.solve = function () {
     resetUI();
     const rawLatex = editor.getValue();
@@ -69,26 +64,16 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     try {
-      // ۱. LaTeX → Linear
       const linearNormalized = MathAdapter.latexToLinear(rawLatex);
       console.log("Linearized Formula:", linearNormalized);
 
-      // ۲. نرمال‌سازی اولیه
       let expr = normalize(linearNormalized);
-
-      // ۳. نرمال‌سازی کاراکترها
       expr = normalizeMathInput(expr);
-
-      // ۴. اعتبارسنجی نحوی
       expr = validate(expr);
 
-      // ۵. گارد توان‌های کسری غیرمجاز
       rejectFractionalExponents(expr);
-
-      // ۶. تشخیص تقسیم مبهم
       detectAmbiguousDivision(expr);
 
-      // ۷. حل یا ساده‌سازی
       let result;
       if (expr.includes("=")) {
         result = solveEquation(expr, steps);
@@ -96,7 +81,6 @@ document.addEventListener("DOMContentLoaded", () => {
         result = simplify(expr, steps);
       }
 
-      // ۸. نمایش نتیجه‌ی سمبلیک
       resultDiv.innerHTML = "";
       const resultViewer = document.createElement("math-field");
       resultViewer.setAttribute("read-only", "true");
@@ -111,18 +95,15 @@ document.addEventListener("DOMContentLoaded", () => {
       resultViewer.value = latexResult;
       resultDiv.appendChild(resultViewer);
 
-      // ۹. تقریب عددی (Numeric Approximation) – اختیاری
-      // اگر نمی‌خواهی فعلاً فعال باشد، این بلاک را کامنت کن
       try {
         if (typeof evalNumeric === "function") {
-          // می‌توانی به جای expr، linearNormalized را هم بدهی
           const numericVal = evalNumeric(expr);
           if (typeof numericVal === "number" && Number.isFinite(numericVal)) {
             const approxDiv = document.createElement("div");
             approxDiv.className = "approx-result";
             approxDiv.style.marginTop = "4px";
             approxDiv.style.fontSize = "0.9rem";
-            approxDiv.style.color = "#4b5563"; // خاکستری تیره
+            approxDiv.style.color = "#4b5563";
             approxDiv.innerText = "≈ " + numericVal.toFixed(3);
             resultDiv.appendChild(approxDiv);
           }
@@ -131,7 +112,6 @@ document.addEventListener("DOMContentLoaded", () => {
         console.warn("Numeric eval failed:", err);
       }
 
-      // ۱۰. تاریخچه + نمایش مراحل
       history.addToHistory(rawLatex, result);
       showSteps();
       stepsBtn.style.display = "block";
@@ -140,7 +120,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  // تاریخچه (History Management)
   const historyModal = document.getElementById("historyModal");
 
   window.renderHistoryUI = function () {
@@ -156,7 +135,6 @@ document.addEventListener("DOMContentLoaded", () => {
     list.forEach((item) => {
       const box = document.createElement("div");
       box.className = "history-box";
-
       const escapedExpr = encodeURIComponent(item.expression);
 
       box.innerHTML = `
@@ -196,7 +174,6 @@ document.addEventListener("DOMContentLoaded", () => {
     window.solve();
   };
 
-  // مدیریت مودال‌ها (Modal Management)
   const helpBtn = document.getElementById("helpBtn");
   const helpModal = document.getElementById("helpModal");
   const closeHelp = document.getElementById("closeHelp");
@@ -234,10 +211,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 220);
   };
 
-  helpBtn.addEventListener("click", window.openHelpModal);
-  closeHelp.addEventListener("click", window.closeHelpModal);
-  historyBtn.addEventListener("click", window.openHistoryModal);
-  closeHistory.addEventListener("click", window.closeHistoryModal);
+  helpBtn?.addEventListener("click", window.openHelpModal);
+  closeHelp?.addEventListener("click", window.closeHelpModal);
+  historyBtn?.addEventListener("click", window.openHistoryModal);
+  closeHistory?.addEventListener("click", window.closeHistoryModal);
 
   window.addEventListener("click", (e) => {
     if (e.target === helpModal) window.closeHelpModal();
@@ -246,17 +223,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   window.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
-      if (helpModal.classList.contains("show")) window.closeHelpModal();
-      if (historyModal.classList.contains("show")) window.closeHistoryModal();
+      if (helpModal?.classList.contains("show")) window.closeHelpModal();
+      if (historyModal?.classList.contains("show")) window.closeHistoryModal();
     }
   });
 
-  // نسبت دادن رفتار فشردن Enter روی ادیتور
   editor.onEnter(window.solve);
-
-  // اتصال دکمه‌ی «محاسبه»
-  const calculateBtn = document.getElementById("calculateBtn");
-  if (calculateBtn) {
-    calculateBtn.addEventListener("click", window.solve);
-  }
 });

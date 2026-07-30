@@ -516,6 +516,6 @@ button {
 .mini-kbd button:hover {
   background: #f9fafb;
 }
-math-field::part(virtual-keyboard-toggle) {
+/* math-field::part(virtual-keyboard-toggle) {
   display: none !important;
-}
+} */

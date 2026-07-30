@@ -1,3 +1,5 @@
+// src/app/dom.js
+
 export function getUI() {
   return {
     input: document.getElementById("input"),
