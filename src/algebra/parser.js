@@ -9,19 +9,21 @@ function evaluateNumericSqrt(fractionVal) {
   const num = fractionVal.num;
   const den = fractionVal.den;
 
-  let outNum = 1, inNum = num;
+  let outNum = 1,
+    inNum = num;
   for (let i = Math.floor(Math.sqrt(num)); i >= 2; i--) {
     if (inNum % (i * i) === 0) {
       outNum *= i;
-      inNum /= (i * i);
+      inNum /= i * i;
     }
   }
 
-  let outDen = 1, inDen = den;
+  let outDen = 1,
+    inDen = den;
   for (let i = Math.floor(Math.sqrt(den)); i >= 2; i--) {
     if (inDen % (i * i) === 0) {
       outDen *= i;
-      inDen /= (i * i);
+      inDen /= i * i;
     }
   }
 
@@ -69,7 +71,11 @@ export class Parser {
     let node = this.term();
     while (true) {
       const next = this.peek();
-      if (next && next.type === "OP" && (next.value === "+" || next.value === "-")) {
+      if (
+        next &&
+        next.type === "OP" &&
+        (next.value === "+" || next.value === "-")
+      ) {
         const op = this.consume().value;
         const right = this.term();
         node = op === "+" ? node.add(right) : node.subtract(right);
@@ -86,7 +92,11 @@ export class Parser {
     while (true) {
       const next = this.peek();
 
-      if (next && next.type === "OP" && (next.value === "*" || next.value === "/")) {
+      if (
+        next &&
+        next.type === "OP" &&
+        (next.value === "*" || next.value === "/")
+      ) {
         const op = this.consume().value;
         const right = this.power();
 
@@ -94,18 +104,18 @@ export class Parser {
           node = node.multiply(right);
         } else {
           if (!right.isConstant()) {
-            throw new Error("تقسیم بر عبارتی که شامل متغیر است پشتیبانی نمی‌شود.");
+            throw new Error(
+              "تقسیم بر عبارتی که شامل متغیر است پشتیبانی نمی‌شود.",
+            );
           }
           node = node.divideByConstant(right.constantValue());
         }
       } else if (
         next &&
-        (
-          next.type === "NUM" ||
+        (next.type === "NUM" ||
           next.type === "VAR" ||
           next.type === "FN" ||
-          (next.type === "OP" && next.value === "(")
-        )
+          (next.type === "OP" && next.value === "("))
       ) {
         // ضرب ضمنی
         const right = this.power();
@@ -149,6 +159,7 @@ export class Parser {
       throw new Error("پایان غیرمنتظره عبارت.");
     }
 
+    // بخشی از Parser.factor() در فایل parser.js شما
     if (token.type === "FN" && token.value === "sqrt") {
       this.consume("sqrt");
       this.consume("(");
@@ -157,16 +168,20 @@ export class Parser {
 
       if (innerNode.isConstant()) {
         const val = innerNode.constantValue();
+        // فراخوانی تابع ساده‌سازی رادیکال (مانند خروج مربع‌های کامل)
         const { coeff, inside } = evaluateNumericSqrt(val);
 
         if (inside === 1) {
+          // اگر مربع کامل بود (مثل sqrt(9))، مستقیم عدد 3 برگردانده می‌شود
           return Polynomial.fromNumber(coeff);
         }
 
+        // اگر مربع کامل نبود (مثل sqrt(8))، به صورت 2*sqrt(2) ذخیره می‌شود
         const dummyVar = `sqrt(${inside})`;
         return new Polynomial([{ coeff, vars: { [dummyVar]: 1 } }]);
       }
 
+      // برای رادیکال‌های شامل متغیر (مثل sqrt(x))
       const dummyVar = `sqrt(${innerNode.toString()})`;
       return Polynomial.fromVariable(dummyVar);
     }

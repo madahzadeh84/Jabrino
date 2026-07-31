@@ -1,5 +1,3 @@
-// src/app/main.js
-
 import { MathEditor } from "../ui/MathEditor.js";
 import MathAdapter from "../ui/MathAdapter.js";
 import { HistoryManager } from "../ui/HistoryManager.js";
@@ -116,13 +114,10 @@ document.addEventListener("DOMContentLoaded", () => {
   function linearToLatexSafe(linear) {
     if (!linear) return "";
     try {
-      if (typeof MathAdapter.linearToLatex === "function") {
-        return MathAdapter.linearToLatex(linear);
-      }
-      return linear;
+      return MathAdapter.linearToLatex(linear);
     } catch (err) {
       console.warn("خطا در تبدیل عبارات به LaTeX:", err);
-      return linear; // جایگزین احتیاطی (Fallback / جایگزین اضطراری)
+      return String(linear); // جایگزین احتیاطی
     }
   }
 
@@ -289,13 +284,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   stepsBtn.addEventListener("click", toggleSteps);
-  // اگر در HTML onclick="toggleSteps()" دارید، می‌توانید این را نیز اضافه کنید:
-  // window.toggleSteps = toggleSteps;
 
   window.solve = function () {
     resetUI();
 
-    // پاک‌سازی ثبت‌کننده رنگ‌ها برای جلوگیری از نشت وضعیت بین مسائل
     if (typeof MathAdapter.resetVariableColorRegistry === "function") {
       MathAdapter.resetVariableColorRegistry();
     }
@@ -308,24 +300,22 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     try {
-      // ۱. تبدیل LaTeX به رشتهٔ خطی (Linear Notation)
+      // ۱) LaTeX -> linear
       const linearNormalized =
         typeof MathAdapter.latexToLinear === "function"
           ? MathAdapter.latexToLinear(rawLatex)
           : rawLatex;
 
-      console.log("عبارت خطی نرمال‌شده:", linearNormalized);
-
-      // ۲. نرمال‌سازی و اعتبارسنجی ورودی
+      // ۲) normalize + validate
       let expr = normalize(linearNormalized);
       expr = normalizeMathInput(expr);
       expr = validate(expr);
 
-      // ۳. بررسی محدودیت‌های ریاضی (توان کسری و تقسیم مبهم)
+      // ۳) محدودیت‌ها
       rejectFractionalExponents(expr);
       detectAmbiguousDivision(expr);
 
-      // ۴. حل معادله یا ساده‌سازی عبارت
+      // ۴) حل/ساده‌سازی
       let result;
       if (expr.includes("=")) {
         result = solveEquation(expr, steps);
@@ -333,10 +323,11 @@ document.addEventListener("DOMContentLoaded", () => {
         result = simplify(expr, steps);
       }
 
-      // ۵. نمایش نتیجه اصلی با MathLive
+      // ۵) نمایش نتیجه
       resultDiv.innerHTML = "";
       const resultViewer = document.createElement("math-field");
       resultViewer.setAttribute("read-only", "true");
+      resultViewer.setAttribute("dir", "ltr");
       resultViewer.style.border = "none";
       resultViewer.style.background = "transparent";
       resultViewer.style.outline = "none";
@@ -346,7 +337,7 @@ document.addEventListener("DOMContentLoaded", () => {
       resultViewer.value = latexResult;
       resultDiv.appendChild(resultViewer);
 
-      // ۶. محاسبه و نمایش تقریب عددی (Numeric Approximation)
+      // ۶) تقریب عددی
       try {
         if (typeof evalNumeric === "function") {
           const numericVal = evalNumeric(expr);
@@ -364,10 +355,10 @@ document.addEventListener("DOMContentLoaded", () => {
         console.warn("ارزیابی عددی انجام نشد:", err);
       }
 
-      // ۷. ثبت در تاریخچه
+      // ۷) تاریخچه
       history.addToHistory(rawLatex, result);
 
-      // ۸. فعال‌سازی دکمه نمایش مراحل
+      // ۸) دکمه مراحل
       if (steps && steps.length > 0) {
         stepsBtn.style.display = "inline-block";
         stepsBtn.disabled = false;
@@ -384,8 +375,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // ---------------------------
   const historyModal = document.getElementById("historyModal");
   const helpModal = document.getElementById("helpModal");
+  const aboutModal = document.getElementById("aboutModal");
 
-  // بازنویسی رندر تاریخچه با فرمت استاندارد ریاضی (History Math Rendering)
   window.renderHistoryUI = function () {
     const container = document.getElementById("historyContainer");
     if (!container) return;
@@ -402,7 +393,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const box = document.createElement("div");
       box.className = "history-box";
 
-      // ۱. بخش نمایش عبارت ورودی به شکل فرمول ریاضی (Input Expression Math Field)
       const exprClickable = document.createElement("div");
       exprClickable.className = "history-expr-clickable";
       exprClickable.title = "کلیک کنید تا در ویرایشگر بارگذاری شود";
@@ -419,7 +409,6 @@ document.addEventListener("DOMContentLoaded", () => {
         window.loadFromHistory(encodeURIComponent(item.expression));
       });
 
-      // ۲. بخش نمایش پاسخ به شکل فرمول ریاضی (Result Math Field)
       const resBox = document.createElement("div");
       resBox.id = `res-box-${item.id}`;
       resBox.className = "history-res-box";
@@ -433,7 +422,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       resBox.appendChild(resMath);
 
-      // ۳. بخش فوتر و دکمه‌ها (Actions Footer)
       const footer = document.createElement("div");
       footer.className = "history-footer";
 
@@ -527,6 +515,24 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 220);
   };
 
+  // --- مودال درباره ما ---
+  window.openAboutModal = () => {
+    if (!aboutModal) return;
+    aboutModal.classList.remove("hide");
+    aboutModal.classList.add("show");
+    aboutModal.style.display = "flex";
+  };
+
+  window.closeAboutModal = () => {
+    if (!aboutModal) return;
+    aboutModal.classList.remove("show");
+    aboutModal.classList.add("hide");
+    setTimeout(() => {
+      aboutModal.style.display = "none";
+      aboutModal.classList.remove("hide");
+    }, 220);
+  };
+
   document
     .getElementById("helpBtn")
     ?.addEventListener("click", window.openHelpModal);
@@ -540,16 +546,22 @@ document.addEventListener("DOMContentLoaded", () => {
     .getElementById("closeHistory")
     ?.addEventListener("click", window.closeHistoryModal);
 
+  // دکمه‌های درباره ما
+  document
+    .getElementById("aboutBtn")
+    ?.addEventListener("click", window.openAboutModal);
+  document
+    .getElementById("closeAbout")
+    ?.addEventListener("click", window.closeAboutModal);
+
   // --- دکمه پاک‌سازی تاریخچه (داخل DOMContentLoaded) ---
   const clearHistoryBtn = document.getElementById("clearHistoryBtn");
   clearHistoryBtn?.addEventListener("click", () => {
     if (!confirm("آیا از پاک کردن تمام تاریخچه اطمینان دارید؟")) return;
 
-    // اگر HistoryManager متد clearAll دارد، از آن استفاده شود
     if (typeof history.clearAll === "function") {
       history.clearAll();
     } else {
-      // در غیر این صورت، پاک‌سازی مستقیم LocalStorage (در صورت نیاز)
       localStorage.removeItem("jabrino_calculations_history");
     }
 
@@ -560,12 +572,14 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("click", (e) => {
     if (e.target === helpModal) window.closeHelpModal();
     if (e.target === historyModal) window.closeHistoryModal();
+    if (e.target === aboutModal) window.closeAboutModal();
   });
 
   window.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
       if (helpModal?.classList.contains("show")) window.closeHelpModal();
       if (historyModal?.classList.contains("show")) window.closeHistoryModal();
+      if (aboutModal?.classList.contains("show")) window.closeAboutModal();
     }
   });
 
@@ -574,5 +588,3 @@ document.addEventListener("DOMContentLoaded", () => {
 
   editor.onEnter(window.solve);
 });
-
-// *** توجه: بلوک قبلی clearHistoryBtn که بیرون از DOMContentLoaded بود، در این نسخه حذف شده است. ***

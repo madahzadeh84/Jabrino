@@ -1,5 +1,3 @@
-// src/algebra/solveEquation.js
-
 import { tokenize } from "../algebra/tokenizer.js";
 import { Parser } from "../algebra/parser.js";
 
@@ -9,37 +7,11 @@ export function parsePolynomial(expr) {
   return parser.parse();
 }
 
-export function simplify(expr, steps = []) {
-  // گام ۱: عبارت اولیه
-  steps.push({
-    kind: "info",
-    title: "عبارت اولیه",
-    description: "عبارت ورودی به فرم خطیِ قابل پردازش تبدیل می‌شود.",
-    from: expr,
-  });
-
-  const poly = parsePolynomial(expr);
-
-  // گام ۲: بسط و ترکیب جملات هم‌نوع
-  const simplified = poly.toString();
-  steps.push({
-    kind: "transform",
-    title: "بسط و ترکیب جملات هم‌نوع",
-    description:
-      "عبارت به صورت چندجمله‌ای استاندارد نوشته می‌شود و جملات هم‌نوع با هم ترکیب می‌شوند.",
-    from: expr,
-    to: simplified,
-  });
-
-  return simplified;
-}
-
 export function solveEquation(eq, steps = []) {
-  // گام ۰: ثبت معادله اولیه
   steps.push({
     kind: "info",
-    title: "معادله اولیه",
-    description: "این معادله‌ای است که کاربر وارد کرده است.",
+    title: "صورت مسئله",
+    description: "معادله‌ای که وارد شده، از همین‌جا بررسی می‌شود.",
     from: eq,
   });
 
@@ -52,21 +24,54 @@ export function solveEquation(eq, steps = []) {
   const left = parsePolynomial(leftRaw.trim());
   const right = parsePolynomial(rightRaw.trim());
 
-  const leftStr = left.toString();
-  const rightStr = right.toString();
+  const leftStr =
+    typeof left.toDisplayString === "function"
+      ? left.toDisplayString()
+      : left.toString();
 
-  // گام ۱: تبدیل هر طرف به فرم چندجمله‌ای
+  const rightStr =
+    typeof right.toDisplayString === "function"
+      ? right.toDisplayString()
+      : right.toString();
+
   steps.push({
     kind: "transform",
-    title: "بسط هر دو طرف معادله",
-    description: "هر طرف معادله به صورت چندجمله‌ای نوشته می‌شود.",
+    title: "ساده کردن طرف چپ",
+    description: "طرف چپ معادله تا جای ممکن ساده می‌شود.",
+    from: leftRaw.trim(),
+    to: leftStr,
+  });
+
+  steps.push({
+    kind: "transform",
+    title: "ساده کردن طرف راست",
+    description: "طرف راست معادله نیز تا جای ممکن ساده می‌شود.",
+    from: rightRaw.trim(),
+    to: rightStr,
+  });
+
+  steps.push({
+    kind: "transform",
+    title: "نوشتن معادله به شکل ساده‌تر",
+    description: "اکنون هر دو طرف معادله را به صورت ساده‌تر می‌نویسیم.",
     from: eq,
     to: `${leftStr} = ${rightStr}`,
   });
 
-  // گام ۲: انتقال همه عبارت‌ها به یک سمت (diff = 0)
-  const diff = left.subtract(right); // ax + b = 0
-  const diffStr = diff.toString();
+  const diff = left.subtract(right);
+  const diffStr =
+    typeof diff.toDisplayString === "function"
+      ? diff.toDisplayString()
+      : diff.toString();
+
+  // steps.push({
+  //   kind: "transform",
+  //   title: "هم‌ارز کردن دو طرف معادله",
+  //   description:
+  //     "برای اینکه پیدا کردن مقدار متغیر آسان‌تر شود، معادله را به شکلی می‌نویسیم که یک طرف آن صفر باشد.",
+  //   from: `${leftStr} = ${rightStr}`,
+  //   to: `${diffStr} = 0`,
+  // });
 
   const { variable, a, b } = diff.toLinearForm();
 
@@ -84,29 +89,30 @@ export function solveEquation(eq, steps = []) {
     throw new Error("جواب ندارد.");
   }
 
-  // ----------------------
-  // گام‌های «مثل دانش‌آموز فکر کردن»
-  // ----------------------
-  //
-  // معادله ما در این مرحله به فرم: a x + b = 0 است.
-  // از این، دو مرحله می‌سازیم:
-  // ۱) a x = -b
-  // ۲) x = (-b) / a
+  const minusB = b.negate();
+  const axEqMinusB = `${a.toString()}${variable} = ${minusB.toString()}`;
 
-  const minusB = b.negate(); // -b
-  const axEqMinusB = `${a.toString()}${variable} = ${minusB.toString()}`; // مثال: 28x = 5
+  // steps.push({
+  //   kind: "transform",
+  //   title: "رسیدن به شکل مناسب برای پیدا کردن مقدار متغیر",
+  //   description:
+  //     "معادله را طوری ساده می‌کنیم که مقدار متغیر روشن‌تر دیده شود.",
+  //   from: `${diffStr} = 0`,
+  //   to: axEqMinusB,
+  // });
 
-  // گام ۴: تقسیم دو طرف بر ضریب متغیر و به‌دست‌آوردن جواب
-  const x = minusB.divide(a); // x = (-b) / a
-  const solutionStr = `${variable} = ${x.toString()}`;
+const x = minusB.divide(a);
+const solutionStr = `${variable} = ${x.toString()}`;
 
-  steps.push({
-    kind: "solution",
-    title: "به‌دست‌آوردن جواب معادله",
-    description: `دو طرف معادله را بر ضریب ${variable} یعنی ${a.toString()} تقسیم می‌کنیم، بنابراین ${solutionStr}.`,
-    from: axEqMinusB,
-    to: solutionStr,
-  });
+steps.push({
+  kind: "solution",
+  title: "پیدا کردن مقدار متغیر",
+  description:
+    `برای پیدا کردن مقدار ${variable}، عددِ سمت دیگر مساوی یعنی ${minusB.toString()} را بر ضریب متغیر یعنی ${a.toString()} تقسیم می‌کنیم؛ بنابراین ${solutionStr}.`,
+  from: axEqMinusB,
+  to: solutionStr,
+});
+
 
   return solutionStr;
 }

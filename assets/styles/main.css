@@ -846,3 +846,51 @@ math-field::part(virtual-keyboard-key).ML__hide {
   font-size: 0.9rem;
   line-height: 1.5;
 }
+
+.about-top-brand-btn {
+  position: fixed;
+  top: 12px;
+  right: 16px;        /* اگر ترجیح می‌دهی بالا چپ باشد، این را به left تغییر بده */
+  z-index: 60;
+
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  background: linear-gradient(135deg, #ffffff, #f9fafb);
+  color: #1f2937;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(4px);
+}
+
+.about-top-brand-btn span {
+  pointer-events: none;
+}
+
+.about-top-brand-btn:hover {
+  background: linear-gradient(135deg, #f9fafb, #f3f4f6);
+  border-color: #9ca3af;
+  transform: translateY(-1px);
+}
+
+.about-top-brand-btn:active {
+  transform: translateY(0);
+}
+
+/* روی موبایل: کمی نزدیک‌تر و کوچک‌تر */
+@media (max-width: 640px) {
+  .about-top-brand-btn {
+    top: 8px;
+    right: 10px;
+    padding: 5px 12px;
+    font-size: 11px;
+  }
+}

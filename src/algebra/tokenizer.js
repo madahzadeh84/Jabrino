@@ -1,3 +1,12 @@
+// src/algebra/tokenizer.js
+
+import { Fraction } from "./fraction.js";
+
+/**
+ * تجزیه رشته ورودی به توکن‌های قابل فهم برای Parser
+ * @param {string} input عبارت ریاضی ورودی
+ * @returns {Array} آرایه‌ای از توکن‌ها
+ */
 export function tokenize(input) {
   if (input == null) return [];
 
@@ -24,7 +33,8 @@ export function tokenize(input) {
   }
 
   function insertImplicitMulIfNeeded(nextType) {
-    const atomStarters = new Set(["NUM", "VAR", "FUNC", "LPAREN", "CONST"]);
+    // اصلاح: استفاده از FN برای هماهنگی با پارسر و حذف LPAREN برای دقت بیشتر
+    const atomStarters = new Set(["NUM", "VAR", "FN", "CONST"]);
     if (prevCanMultiply() && atomStarters.has(nextType)) {
       tokens.push({ type: "OP", value: "*" });
     }
@@ -33,7 +43,7 @@ export function tokenize(input) {
   while (i < s.length) {
     const ch = s[i];
 
-    // multi-letter variable / متغیر چندحرفی
+    // متغیرهای چندحرفی در آکولاد
     if (ch === "{") {
       const end = s.indexOf("}", i + 1);
       if (end === -1) {
@@ -51,15 +61,15 @@ export function tokenize(input) {
       continue;
     }
 
-    // sqrt
+    // تابع رادیکال - اصلاح نوع به FN
     if (s.startsWith("sqrt", i)) {
-      insertImplicitMulIfNeeded("FUNC");
-      tokens.push({ type: "FUNC", value: "sqrt" });
+      insertImplicitMulIfNeeded("FN");
+      tokens.push({ type: "FN", value: "sqrt" });
       i += 4;
       continue;
     }
 
-    // number / عدد
+    // عدد (Integer/Float)
     if (/[0-9.]/.test(ch)) {
       insertImplicitMulIfNeeded("NUM");
 
@@ -83,29 +93,32 @@ export function tokenize(input) {
       continue;
     }
 
-    // (
+    // پرانتز باز
     if (ch === "(") {
-      insertImplicitMulIfNeeded("LPAREN");
+      // ضرب ضمنی قبل از پرانتز باز (مانند 2(x+1))
+      if (prevCanMultiply()) {
+        tokens.push({ type: "OP", value: "*" });
+      }
       tokens.push({ type: "OP", value: "(" });
       i++;
       continue;
     }
 
-    // )
+    // پرانتز بسته
     if (ch === ")") {
       tokens.push({ type: "OP", value: ")" });
       i++;
       continue;
     }
 
-    // operators / عملگرها
+    // عملگرها
     if ("+-*/^=".includes(ch)) {
       tokens.push({ type: "OP", value: ch });
       i++;
       continue;
     }
 
-    // single-letter variables / متغیر تک‌حرفی
+    // متغیرهای تک‌حرفی
     if (/[a-zA-Z]/.test(ch)) {
       insertImplicitMulIfNeeded("VAR");
       tokens.push({ type: "VAR", value: ch });
@@ -113,7 +126,7 @@ export function tokenize(input) {
       continue;
     }
 
-    throw new Error(`کاراکتر نامعتبر: ${ch}`);
+    throw new Error(`کاراکتر نامعتبر شناسایی شد: ${ch}`);
   }
 
   return tokens;
