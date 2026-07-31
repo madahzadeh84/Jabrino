@@ -894,3 +894,57 @@ math-field::part(virtual-keyboard-key).ML__hide {
     font-size: 11px;
   }
 }
+
+.appreciation-section {
+  direction: rtl;
+  text-align: right;
+  line-height: 2;
+}
+
+.section-title {
+  margin-bottom: 12px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #1f3c88;
+}
+
+.section-text {
+  margin: 0 0 12px 0;
+  color: #333;
+}
+
+.appreciation-box {
+  margin-top: 16px;
+  padding: 16px;
+  background: #f7f9fc;
+  border: 1px solid #e3e8f0;
+  border-radius: 12px;
+}
+
+.appreciation-intro {
+  margin: 0 0 10px 0;
+  font-weight: 600;
+  color: #222;
+}
+
+.person-item {
+  padding: 10px 0;
+  border-bottom: 1px solid #e6e6e6;
+}
+
+.person-item:last-child {
+  border-bottom: none;
+}
+
+.person-name {
+  display: block;
+  font-weight: 700;
+  color: #1f1f1f;
+}
+
+.person-role {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.95rem;
+  color: #555;
+}
