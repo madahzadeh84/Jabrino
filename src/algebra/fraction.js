@@ -19,14 +19,20 @@ export class Fraction {
   static fromNumber(val) {
     if (val instanceof Fraction) return val;
     if (Number.isInteger(val)) return new Fraction(val, 1);
-    
+
     const str = String(val);
     if (!str.includes(".")) return new Fraction(parseInt(str, 10), 1);
-    
+
     const decimalPlaces = str.split(".")[1].length;
     const denominator = Math.pow(10, decimalPlaces);
     const numerator = Math.round(val * denominator);
     return new Fraction(numerator, denominator);
+  }
+
+  static isPowerOfTen(n) {
+    if (n < 1) return false;
+    while (n % 10 === 0) n /= 10;
+    return n === 1;
   }
 
   add(other) {
@@ -62,6 +68,17 @@ export class Fraction {
 
   isZero() {
     return this.num === 0;
+  }
+
+  toDisplayString() {
+    if (this.den === 1) return String(this.num);
+
+    if (Fraction.isPowerOfTen(this.den)) {
+      const digits = String(this.den).length - 1;
+      return (this.num / this.den).toFixed(digits).replace(/\.?0+$/, "");
+    }
+
+    return this.toString();
   }
 
   toString() {

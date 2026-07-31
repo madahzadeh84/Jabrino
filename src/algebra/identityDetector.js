@@ -147,10 +147,7 @@ function detectSimpleDistribution(expr) {
         raw: s,
         normalized: s,
         generalForm: "(a±b)c",
-        expansionForm:
-          parts.sign === "+"
-            ? "ac+bc"
-            : "ac-bc",
+        expansionForm: parts.sign === "+" ? "ac+bc" : "ac-bc",
         matchedParts: {
           a: parts.left,
           b: parts.right,
@@ -174,10 +171,7 @@ function detectSimpleDistribution(expr) {
         raw: s,
         normalized: s,
         generalForm: "c(a±b)",
-        expansionForm:
-          parts.sign === "+"
-            ? "ca+cb"
-            : "ca-cb",
+        expansionForm: parts.sign === "+" ? "ca+cb" : "ca-cb",
         matchedParts: {
           a: parts.left,
           b: parts.right,

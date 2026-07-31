@@ -1,47 +1,119 @@
-// src/core/tokenizer.js
-export function tokenize(str) {
-  str = str.replace(/\s+/g, "");
+export function tokenize(input) {
+  if (input == null) return [];
 
-  // موقتاً فقط این دو implicit-mul را داشته باش:
-  str = str.replace(/(\d)\(/g, "$1*(");     // 2(x+1) -> 2*(x+1)
-  str = str.replace(/\)(\d)/g, ")*$1");     // (x+1)2 -> (x+1)*2
+  let s = String(input)
+    .replace(/\\textcolor\{[^}]*\}\{([^{}]*)\}/g, "$1")
+    .replace(/\\left/g, "")
+    .replace(/\\right/g, "")
+    .replace(/[\u200B-\u200D\uFEFF]/g, "")
+    .replace(/\s+/g, "");
 
-  
   const tokens = [];
   let i = 0;
 
-  while (i < str.length) {
+  function prevCanMultiply() {
+    const prev = tokens[tokens.length - 1];
+    if (!prev) return false;
 
-    // --- تشخیص sqrt ---
-    if (str.startsWith("sqrt", i)) {
-      tokens.push({ type: "FN", value: "sqrt" });
+    return (
+      prev.type === "NUM" ||
+      prev.type === "VAR" ||
+      prev.type === "CONST" ||
+      (prev.type === "OP" && prev.value === ")")
+    );
+  }
+
+  function insertImplicitMulIfNeeded(nextType) {
+    const atomStarters = new Set(["NUM", "VAR", "FUNC", "LPAREN", "CONST"]);
+    if (prevCanMultiply() && atomStarters.has(nextType)) {
+      tokens.push({ type: "OP", value: "*" });
+    }
+  }
+
+  while (i < s.length) {
+    const ch = s[i];
+
+    // multi-letter variable / متغیر چندحرفی
+    if (ch === "{") {
+      const end = s.indexOf("}", i + 1);
+      if (end === -1) {
+        throw new Error("آکولاد بسته نشده است.");
+      }
+
+      const name = s.slice(i + 1, end).trim();
+      if (!/^[a-zA-Z][a-zA-Z0-9_]*$/.test(name)) {
+        throw new Error(`نام متغیر نامعتبر است: {${name}}`);
+      }
+
+      insertImplicitMulIfNeeded("VAR");
+      tokens.push({ type: "VAR", value: name });
+      i = end + 1;
+      continue;
+    }
+
+    // sqrt
+    if (s.startsWith("sqrt", i)) {
+      insertImplicitMulIfNeeded("FUNC");
+      tokens.push({ type: "FUNC", value: "sqrt" });
       i += 4;
       continue;
     }
 
-    const char = str[i];
+    // number / عدد
+    if (/[0-9.]/.test(ch)) {
+      insertImplicitMulIfNeeded("NUM");
 
-    if ("+-*/^()".includes(char)) {
-      tokens.push({ type: "OP", value: char });
-      i++;
-    } else if (/[0-9.]/.test(char)) {
       let num = "";
       let dotCount = 0;
-      while (i < str.length && /[0-9.]/.test(str[i])) {
-        if (str[i] === ".") dotCount++;
-        num += str[i];
+
+      while (i < s.length && /[0-9.]/.test(s[i])) {
+        if (s[i] === ".") dotCount++;
+        num += s[i];
         i++;
       }
+
       if (dotCount > 1 || num === ".") {
-        throw new Error("عدد نامعتبر است.");
+        throw new Error(`عدد نامعتبر است: ${num}`);
       }
-      tokens.push({ type: "NUM", value: parseFloat(num) });
-    } else if (/[a-zA-Z]/.test(char)) {
-      tokens.push({ type: "VAR", value: char });
-      i++;
-    } else {
-      throw new Error(`کاراکتر نامعتبر: ${char}`);
+
+      tokens.push({
+        type: "NUM",
+        value: num.includes(".") ? parseFloat(num) : parseInt(num, 10),
+      });
+      continue;
     }
+
+    // (
+    if (ch === "(") {
+      insertImplicitMulIfNeeded("LPAREN");
+      tokens.push({ type: "OP", value: "(" });
+      i++;
+      continue;
+    }
+
+    // )
+    if (ch === ")") {
+      tokens.push({ type: "OP", value: ")" });
+      i++;
+      continue;
+    }
+
+    // operators / عملگرها
+    if ("+-*/^=".includes(ch)) {
+      tokens.push({ type: "OP", value: ch });
+      i++;
+      continue;
+    }
+
+    // single-letter variables / متغیر تک‌حرفی
+    if (/[a-zA-Z]/.test(ch)) {
+      insertImplicitMulIfNeeded("VAR");
+      tokens.push({ type: "VAR", value: ch });
+      i++;
+      continue;
+    }
+
+    throw new Error(`کاراکتر نامعتبر: ${ch}`);
   }
 
   return tokens;

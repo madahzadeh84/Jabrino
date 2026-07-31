@@ -15,7 +15,7 @@ export function simplify(expr, steps = []) {
     kind: "info",
     title: "عبارت اولیه",
     description: "عبارت ورودی به فرم خطیِ قابل پردازش تبدیل می‌شود.",
-    from: expr
+    from: expr,
   });
 
   const poly = parsePolynomial(expr);
@@ -25,9 +25,10 @@ export function simplify(expr, steps = []) {
   steps.push({
     kind: "transform",
     title: "بسط و ترکیب جملات هم‌نوع",
-    description: "عبارت به صورت چندجمله‌ای استاندارد نوشته می‌شود و جملات هم‌نوع با هم ترکیب می‌شوند.",
+    description:
+      "عبارت به صورت چندجمله‌ای استاندارد نوشته می‌شود و جملات هم‌نوع با هم ترکیب می‌شوند.",
     from: expr,
-    to: simplified
+    to: simplified,
   });
 
   return simplified;
@@ -39,7 +40,7 @@ export function solveEquation(eq, steps = []) {
     kind: "info",
     title: "معادله اولیه",
     description: "این معادله‌ای است که کاربر وارد کرده است.",
-    from: eq
+    from: eq,
   });
 
   const [leftRaw, rightRaw] = eq.split("=");
@@ -51,26 +52,21 @@ export function solveEquation(eq, steps = []) {
   const left = parsePolynomial(leftRaw.trim());
   const right = parsePolynomial(rightRaw.trim());
 
+  const leftStr = left.toString();
+  const rightStr = right.toString();
+
   // گام ۱: تبدیل هر طرف به فرم چندجمله‌ای
   steps.push({
     kind: "transform",
     title: "بسط هر دو طرف معادله",
     description: "هر طرف معادله به صورت چندجمله‌ای نوشته می‌شود.",
     from: eq,
-    to: `${left.toString()} = ${right.toString()}`
+    to: `${leftStr} = ${rightStr}`,
   });
 
   // گام ۲: انتقال همه عبارت‌ها به یک سمت (diff = 0)
   const diff = left.subtract(right); // ax + b = 0
   const diffStr = diff.toString();
-
-  steps.push({
-    kind: "transform",
-    title: "انتقال همه عبارت‌ها به یک طرف معادله",
-    description: "عبارت سمت راست از سمت چپ کم می‌شود تا معادله به فرم ax + b = 0 برسد.",
-    from: `${left.toString()} = ${right.toString()}`,
-    to: `${diffStr} = 0`
-  });
 
   const { variable, a, b } = diff.toLinearForm();
 
@@ -88,16 +84,28 @@ export function solveEquation(eq, steps = []) {
     throw new Error("جواب ندارد.");
   }
 
-  // گام ۳: ایزوله کردن متغیر (x = -b/a)
-  const x = b.negate().divide(a);
+  // ----------------------
+  // گام‌های «مثل دانش‌آموز فکر کردن»
+  // ----------------------
+  //
+  // معادله ما در این مرحله به فرم: a x + b = 0 است.
+  // از این، دو مرحله می‌سازیم:
+  // ۱) a x = -b
+  // ۲) x = (-b) / a
+
+  const minusB = b.negate(); // -b
+  const axEqMinusB = `${a.toString()}${variable} = ${minusB.toString()}`; // مثال: 28x = 5
+
+  // گام ۴: تقسیم دو طرف بر ضریب متغیر و به‌دست‌آوردن جواب
+  const x = minusB.divide(a); // x = (-b) / a
   const solutionStr = `${variable} = ${x.toString()}`;
 
   steps.push({
     kind: "solution",
     title: "به‌دست‌آوردن جواب معادله",
-    description: `معادله به فرم ${diffStr} = 0 است، پس ${solutionStr}.`,
-    from: `${diffStr} = 0`,
-    to: solutionStr
+    description: `دو طرف معادله را بر ضریب ${variable} یعنی ${a.toString()} تقسیم می‌کنیم، بنابراین ${solutionStr}.`,
+    from: axEqMinusB,
+    to: solutionStr,
   });
 
   return solutionStr;

@@ -29,7 +29,7 @@
   color: #2e90fa;
 }
 
-.frac-widget{
+.frac-widget {
   display: inline-grid;
   grid-template-rows: auto 2px auto;
   gap: 4px;
@@ -41,7 +41,8 @@
   vertical-align: middle;
 }
 
-.frac-num, .frac-den{
+.frac-num,
+.frac-den {
   min-width: 40px;
   padding: 2px 6px;
   border-radius: 8px;
@@ -50,9 +51,14 @@
   text-align: center;
 }
 
-.frac-bar{
+.frac-bar {
   height: 2px;
   background: #111827;
   border-radius: 2px;
-  opacity: .85;
+  opacity: 0.85;
+}
+.frac-num:empty::before,
+.frac-den:empty::before {
+  content: attr(data-placeholder);
+  color: #9ca3af;
 }

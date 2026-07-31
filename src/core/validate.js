@@ -21,19 +21,50 @@ export function validate(expr) {
 
   if (!expr) throw new Error("عبارت خالی است.");
 
-  // ۱. جلوگیری از نقطه‌های پی‌درپی (مانند 3x..4)
+  // ۱. جلوگیری از نقطه‌های پی‌درپی
   if (/\.{2,}/.test(expr)) {
     throw new Error("استفاده از چند نقطه پی‌درپی (..) مجاز نیست.");
   }
 
-  // ۲. جلوگیری از نقطه چسبیده به متغیر (مانند 3x.3 یا x.5)
+  // ۲. جلوگیری از نقطه چسبیده به متغیر تک‌حرفی
+  // مثال: x.5 یا 3x.3
   if (/[a-zA-Z]\.|\.[a-zA-Z]/.test(expr)) {
-    throw new Error("نقطه (.) فقط برای اعداد اعشاری است. برای ضرب از علامت × استفاده کنید.");
+    throw new Error(
+      "نقطه (.) فقط برای اعداد اعشاری است. برای ضرب از علامت × استفاده کنید.",
+    );
   }
 
-  // Only ASCII linear chars (NO backslash)
-  if (!/^[0-9a-zA-Z+\-*/=()^.]+$/.test(expr)) {
+  // ۳. فقط کاراکترهای مجاز خطی + آکولاد
+  // NO backslash
+  if (!/^[0-9a-zA-Z+\-*/=()^._{}]+$/.test(expr)) {
     throw new Error("کاراکتر غیرمجاز وجود دارد.");
+  }
+
+  const braceRegex = /\{([^{}]+)\}/g;
+  let braceMatch;
+  while ((braceMatch = braceRegex.exec(expr)) !== null) {
+    const varName = braceMatch[1];
+    if (!/^[a-zA-Z][a-zA-Z0-9_]*$/.test(varName)) {
+      throw new Error(`نام متغیر داخل آکولاد نامعتبر است: {${varName}}`);
+    }
+  }
+
+  // ۵. آکولاد تودرتو یا ناقص
+  let braceBalance = 0;
+  for (const ch of expr) {
+    if (ch === "{") braceBalance++;
+    if (ch === "}") {
+      braceBalance--;
+      if (braceBalance < 0) throw new Error("آکولاد اضافی وجود دارد.");
+    }
+  }
+  if (braceBalance !== 0) {
+    throw new Error("آکولادها متوازن نیستند.");
+  }
+
+  // ۶. چینش عملگرها
+  if (/[+\-*/^=]{2,}/.test(expr.replace(/--/g, ""))) {
+    throw new Error("چینش عملگرها نامعتبر است.");
   }
 
   // Equals count
@@ -66,24 +97,23 @@ export function validate(expr) {
  * Fractional exponent guard (توانِ کسری / Fractional Exponent)
  */
 export function rejectFractionalExponents(expr) {
-  // پیدا کردن تمامی الگوهای توان به صورت کسر عددی مثل ^(p/q)
   const matches = expr.match(/\^\(\s*\d+\s*\/\s*\d+\s*\)/g);
   if (!matches) return;
 
-  // فیلتر کردن مواردی که توان 1/2 یا همان رادیکال نیستند
-  const unsupported = matches.filter((m) => !/^\^\(\s*1\s*\/\s*2\s*\)$/.test(m));
+  const unsupported = matches.filter(
+    (m) => !/^\^\(\s*1\s*\/\s*2\s*\)$/.test(m),
+  );
 
   if (unsupported.length > 0) {
-    throw new Error(
-      "توانِ کسری فعلاً توسط موتور محاسباتی پشتیبانی نمی‌شود."
-    );
+    throw new Error("توانِ کسری فعلاً توسط موتور محاسباتی پشتیبانی نمی‌شود.");
   }
 }
 
 /**
- * detectAmbiguousDivision (Ambiguous Division)
+ * detectAmbiguousDivision (Ambiguous Division / تقسیم مبهم)
  */
 export function detectAmbiguousDivision(expr) {
+  // فقط برای الگوهای تک‌حرفی ساده
   const pattern = /(\d*)([a-zA-Z])\/(\d*)([a-zA-Z])/g;
   const match = pattern.exec(expr);
 
@@ -98,7 +128,17 @@ export function detectAmbiguousDivision(expr) {
       var1 === var2 ? `${var1}(${a}/${b})` : `(${a}${var1})/(${b}${var2})`;
 
     throw new Error(
-      `تقسیم مبهم تشخیص داده شد: ${full}\nآیا منظورتان این بوده است:\n${suggestion}\nدر صورت منظور بودن کسر جبری، لطفاً از پرانتز استفاده کنید.`
+      `تقسیم مبهم تشخیص داده شد: ${full}\nآیا منظورتان این بوده است:\n${suggestion}\nدر صورت منظور بودن کسر جبری، لطفاً از پرانتز استفاده کنید.`,
     );
+  }
+
+  // فقط نام تابع‌های واقعی، نه متغیرهای داخل آکولاد
+  const functionCalls = expr.match(/\b[a-zA-Z]+(?=\()/g) || [];
+  const allowedFunctions = new Set(["sqrt"]);
+
+  for (const fn of functionCalls) {
+    if (!allowedFunctions.has(fn)) {
+      throw new Error(`تابع "${fn}" پشتیبانی نمی‌شود.`);
+    }
   }
 }

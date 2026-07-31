@@ -1,4 +1,4 @@
-//src/ui/HistoryManager.js
+// src/ui/HistoryManager.js
 
 export class HistoryManager {
   constructor(key = "jabrino_calculations_history") {
@@ -19,12 +19,12 @@ export class HistoryManager {
 
   addToHistory(expression, result) {
     let history = this.getHistory();
-    history = history.filter(item => item.expression !== expression);
+    history = history.filter((item) => item.expression !== expression);
 
     history.unshift({
-      id: Date.now() + Math.random().toString(36).substr(2, 5),
+      id: crypto.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
       expression: expression,
-      result: result
+      result: result,
     });
 
     if (history.length > 20) {
@@ -35,7 +35,12 @@ export class HistoryManager {
 
   deleteItem(id) {
     let history = this.getHistory();
-    history = history.filter(item => item.id !== id);
+    history = history.filter((item) => item.id !== id);
     this.saveHistory(history);
+  }
+
+  // متد جدید برای پاک‌سازی کامل تاریخچه
+  clearAll() {
+    localStorage.removeItem(this.key);
   }
 }

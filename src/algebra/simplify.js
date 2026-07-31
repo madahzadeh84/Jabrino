@@ -15,46 +15,6 @@ function parsePolynomial(expr) {
   return parser.parse();
 }
 
-function formatIdentityDescription(identity) {
-  switch (identity.kind) {
-    case "BINOMIAL_SQUARE":
-      return {
-        title: "تشخیص اتحاد مربع دوجمله‌ای",
-        description:
-          "اتحاد مربع دوجمله‌ای (Binomial Square | مربع دوجمله‌ای) در عبارت شناسایی شد.",
-      };
-
-    case "CONJUGATE":
-      return {
-        title: "تشخیص اتحاد مزدوج",
-        description:
-          "اتحاد مزدوج (Conjugate Identity | اتحاد مزدوج) از نوع \n(a+b)(a-b) در عبارت شناسایی شد.",
-      };
-
-    case "DISTRIBUTION":
-      return {
-        title: "تشخیص خاصیت توزیع‌پذیری",
-        description:
-          "الگوی توزیع‌پذیری (Distributive Property | خاصیت توزیع‌پذیری) در عبارت شناسایی شد.",
-      };
-
-    default:
-      return {
-        title: "تشخیص الگوی جبری",
-        description:
-          "یک الگوی جبری (Algebraic Pattern | الگوی جبری) در عبارت شناسایی شد.",
-      };
-  }
-}
-
-function buildIdentityPreview(identity) {
-  if (!identity) return "";
-
-  const gf = identity.generalForm || "";
-  const ef = identity.expansionForm || "";
-  return ef ? `${gf}  →  ${ef}` : gf;
-}
-
 function buildIdentityApplication(expr, identity) {
   if (!identity) return expr;
 
@@ -95,7 +55,7 @@ export function simplify(expr, steps = []) {
   addInfoStep(steps, {
     title: "عبارت اولیه",
     description:
-      "عبارت ورودی ثبت می‌شود و برای تحلیل، تشخیص الگوهای جبری و ساده‌سازی آماده می‌شود.",
+      "عبارت ورودی ثبت شده و برای فرآیند تجزیه‌وتحلیل و ساده‌سازی آماده می‌شود.",
     value: expr,
     meta: {
       exprOriginal: expr,
@@ -107,43 +67,17 @@ export function simplify(expr, steps = []) {
   const primaryIdentity = identities[0] || null;
 
   if (primaryIdentity) {
-    const identityText = formatIdentityDescription(primaryIdentity);
-
-    addInfoStep(steps, {
-      title: identityText.title,
-      description:
-        `${identityText.description}\n` +
-        `بخش شناسایی‌شده در عبارت: ${primaryIdentity.raw}`,
-      value: buildIdentityPreview(primaryIdentity),
-      meta: {
-        identity: primaryIdentity,
-        preview: buildIdentityPreview(primaryIdentity),
-        generalForm: primaryIdentity.generalForm,
-        expansionForm: primaryIdentity.expansionForm,
-        matchedParts: primaryIdentity.matchedParts,
-      },
-    });
-
     const applied = buildIdentityApplication(expr, primaryIdentity);
 
     if (applied && applied !== expr) {
       addTransformStep(steps, {
-        title:
-          primaryIdentity.kind === "BINOMIAL_SQUARE"
-            ? "اعمال اتحاد مربع دوجمله‌ای"
-            : primaryIdentity.kind === "CONJUGATE"
-            ? "اعمال اتحاد مزدوج"
-            : "اعمال توزیع‌پذیری",
+        title: "گشودن پرانتز",
         description:
-          primaryIdentity.kind === "BINOMIAL_SQUARE"
-            ? "با استفاده از فرمول اتحاد مربع دوجمله‌ای، عبارت به مجموع جمله‌های استاندارد تبدیل می‌شود."
-            : primaryIdentity.kind === "CONJUGATE"
-            ? "با استفاده از اتحاد مزدوج، حاصل‌ضرب دو عبارت مزدوج به تفاضل دو مربع تبدیل می‌شود."
-            : "با استفاده از خاصیت توزیع‌پذیری، عامل مشترک در جمله‌های داخل پرانتز توزیع می‌شود.",
+          "با گشودن پرانتزها، عبارت به شکل بازشده و تفکیک‌شده نوشته می‌شود.",
         from: expr,
         to: applied,
         meta: {
-          phase: "identity-application",
+          phase: "rewrite",
           identity: primaryIdentity.kind,
         },
       });
@@ -155,13 +89,13 @@ export function simplify(expr, steps = []) {
 
   try {
     poly = parsePolynomial(expr);
-    result = poly.toString();
+    result = poly.toDisplayString();
   } catch (e) {
     addInfoStep(steps, {
       title: "خطا در ساده‌سازی",
       description:
-        "در حین بسط و ساده‌سازی عبارت خطایی رخ داد.\n" +
-        `جزئیات فنی (Technical Details | جزئیات فنی): ${e.message}`,
+        "در حین انجام محاسبات و ساده‌سازی عبارت خطایی رخ داد.\n" +
+        `جزئیات فنی: ${e.message}`,
       value: expr,
       meta: { error: e.message, expr },
     });
@@ -175,9 +109,9 @@ export function simplify(expr, steps = []) {
 
   if (result !== lastTransformTo) {
     addTransformStep(steps, {
-      title: "ترکیب جملات هم‌نوع",
+      title: "ساده‌سازی عبارت",
       description:
-        "پس از بسط، جمله‌های هم‌نوع (Like Terms | جملات هم‌نوع) با هم ترکیب می‌شوند تا عبارت به فرم ساده‌تر و استاندارد برسد.",
+        "جمله‌های هم‌نوع با یکدیگر ترکیب می‌شوند تا عبارت به فرم ساده‌تر برسد.",
       from: lastTransformTo,
       to: result,
       meta: {
@@ -186,9 +120,9 @@ export function simplify(expr, steps = []) {
     });
   } else if (result !== expr) {
     addTransformStep(steps, {
-      title: "بسط و ترکیب جملات هم‌نوع",
+      title: "ساده‌سازی عبارت",
       description:
-        "عبارت با استفاده از موتور چندجمله‌ای (Polynomial Engine | موتور چندجمله‌ای) بسط داده شده و سپس جمله‌های هم‌نوع با هم ترکیب می‌شوند.",
+        "عبارت به کمک موتور چندجمله‌ای محاسبه شده و جمله‌های هم‌نوع با یکدیگر ترکیب می‌شوند.",
       from: expr,
       to: result,
       meta: {
@@ -199,7 +133,7 @@ export function simplify(expr, steps = []) {
 
   addSolutionStep(steps, {
     description:
-      "این عبارت، فرم نهایی و ساده‌شده (Simplified Form | فرم ساده‌شده) بعد از اعمال تبدیل‌های جبری است.",
+      "این عبارت، فرم نهایی و ساده‌شده پس از انجام تمامی تبدیل‌های جبری است.",
     value: result,
     meta: {
       identitiesCount: identities.length,

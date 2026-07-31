@@ -22,9 +22,9 @@ export class Polynomial {
 
   static varsKey(vars) {
     return Object.keys(vars)
-      .filter(k => vars[k] !== 0)
+      .filter((k) => vars[k] !== 0)
       .sort()
-      .map(k => vars[k] === 1 ? k : `${k}^${vars[k]}`)
+      .map((k) => (vars[k] === 1 ? k : `${k}^${vars[k]}`))
       .join("*");
   }
 
@@ -38,21 +38,19 @@ export class Polynomial {
       }
       map.set(key, {
         coeff: map.get(key).coeff.add(t.coeff),
-        vars: { ...t.vars }
+        vars: { ...t.vars },
       });
     }
 
-    return new Polynomial(
-      [...map.values()].filter(t => !t.coeff.isZero())
-    );
+    return new Polynomial([...map.values()].filter((t) => !t.coeff.isZero()));
   }
 
   subtract(other) {
     const neg = new Polynomial(
-      other.terms.map(t => ({
+      other.terms.map((t) => ({
         coeff: t.coeff.negate(),
-        vars: { ...t.vars }
-      }))
+        vars: { ...t.vars },
+      })),
     );
     return this.add(neg);
   }
@@ -77,13 +75,13 @@ export class Polynomial {
 
         result.set(key, {
           coeff: result.get(key).coeff.add(coeff),
-          vars
+          vars,
         });
       }
     }
 
     return new Polynomial(
-      [...result.values()].filter(t => !t.coeff.isZero())
+      [...result.values()].filter((t) => !t.coeff.isZero()),
     );
   }
 
@@ -116,15 +114,15 @@ export class Polynomial {
     }
 
     return new Polynomial(
-      this.terms.map(t => ({
+      this.terms.map((t) => ({
         coeff: t.coeff.divide(divisor),
-        vars: { ...t.vars }
-      }))
+        vars: { ...t.vars },
+      })),
     );
   }
 
   isConstant() {
-    return this.terms.every(t => Object.keys(t.vars).length === 0);
+    return this.terms.every((t) => Object.keys(t.vars).length === 0);
   }
 
   constantValue() {
@@ -200,7 +198,7 @@ export class Polynomial {
 
       let varPart = Object.keys(term.vars)
         .sort()
-        .map(v => term.vars[v] === 1 ? v : `${v}^${term.vars[v]}`)
+        .map((v) => (term.vars[v] === 1 ? v : `${v}^${term.vars[v]}`))
         .join("");
 
       let piece = "";
@@ -209,7 +207,10 @@ export class Polynomial {
         if (absCoeff.num === 1 && absCoeff.den === 1) {
           piece = varPart;
         } else {
-          piece = absCoeff.den === 1 ? absCoeff.num + varPart : `(${absCoeff.toString()})${varPart}`;
+          piece =
+            absCoeff.den === 1
+              ? absCoeff.num + varPart
+              : `(${absCoeff.toString()})${varPart}`;
         }
       } else {
         piece = absCoeff.toString();
@@ -219,6 +220,58 @@ export class Polynomial {
         result += isNegative ? "-" + piece : piece;
       } else {
         result += isNegative ? " - " + piece : " + " + piece;
+      }
+    });
+
+    return result || "0";
+  }
+  toDisplayString() {
+    if (this.terms.length === 0) return "0";
+
+    const sorted = [...this.terms].sort((a, b) => {
+      const degA = Object.values(a.vars).reduce((s, x) => s + x, 0);
+      const degB = Object.values(b.vars).reduce((s, x) => s + x, 0);
+      if (degB !== degA) return degB - degA;
+
+      const keyA = Polynomial.varsKey(a.vars);
+      const keyB = Polynomial.varsKey(b.vars);
+      return keyA.localeCompare(keyB);
+    });
+
+    let result = "";
+
+    sorted.forEach((term, index) => {
+      const coeff = term.coeff;
+      if (coeff.isZero()) return;
+
+      const isNegative = coeff.num < 0;
+      const absCoeff = new Fraction(Math.abs(coeff.num), coeff.den);
+
+      const varPart = Object.keys(term.vars)
+        .sort()
+        .map((v) => (term.vars[v] === 1 ? v : `${v}^${term.vars[v]}`))
+        .join("");
+
+      let piece = "";
+
+      if (varPart) {
+        if (absCoeff.num === 1 && absCoeff.den === 1) {
+          piece = varPart;
+        } else {
+          const displayCoeff = absCoeff.toDisplayString();
+          piece =
+            absCoeff.den === 1 || Fraction.isPowerOfTen(absCoeff.den)
+              ? `${displayCoeff}${varPart}`
+              : `(${displayCoeff})${varPart}`;
+        }
+      } else {
+        piece = absCoeff.toDisplayString();
+      }
+
+      if (index === 0) {
+        result += isNegative ? `-${piece}` : piece;
+      } else {
+        result += isNegative ? ` - ${piece}` : ` + ${piece}`;
       }
     });
 
