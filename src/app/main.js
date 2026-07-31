@@ -555,19 +555,29 @@ document.addEventListener("DOMContentLoaded", () => {
     ?.addEventListener("click", window.closeAboutModal);
 
   // --- دکمه پاک‌سازی تاریخچه (داخل DOMContentLoaded) ---
+  // پیدا کردن دکمه پاک‌سازی تاریخچه
   const clearHistoryBtn = document.getElementById("clearHistoryBtn");
-  clearHistoryBtn?.addEventListener("click", () => {
-    if (!confirm("آیا از پاک کردن تمام تاریخچه اطمینان دارید؟")) return;
 
-    if (typeof history.clearAll === "function") {
-      history.clearAll();
-    } else {
-      localStorage.removeItem("jabrino_calculations_history");
-    }
+  if (clearHistoryBtn) {
+    // حذف شنونده قبلی برای اطمینان و اضافه کردن شنونده جدید
+    clearHistoryBtn.onclick = () => {
+      if (!confirm("آیا از پاک کردن تمام تاریخچه اطمینان دارید؟")) return;
 
-    window.renderHistoryUI();
-    console.log("History cleared successfully.");
-  });
+      // پاک کردن از حافظه مرورگر
+      if (typeof history.clearAll === "function") {
+        history.clearAll();
+      } else {
+        localStorage.removeItem("jabrino_calculations_history");
+      }
+
+      // بروزرسانی رابط کاربری
+      if (typeof window.renderHistoryUI === "function") {
+        window.renderHistoryUI();
+      }
+
+      console.log("History cleared successfully.");
+    };
+  }
 
   window.addEventListener("click", (e) => {
     if (e.target === helpModal) window.closeHelpModal();
