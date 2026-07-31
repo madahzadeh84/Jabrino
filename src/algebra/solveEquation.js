@@ -1,3 +1,5 @@
+// src/equation/solveEquation.js
+
 import { tokenize } from "../algebra/tokenizer.js";
 import { Parser } from "../algebra/parser.js";
 
@@ -24,15 +26,20 @@ export function solveEquation(eq, steps = []) {
   const left = parsePolynomial(leftRaw.trim());
   const right = parsePolynomial(rightRaw.trim());
 
+  // برای حفظ کامل اطلاعات جبری، ابتدا از toString استفاده می‌کنیم.
   const leftStr =
-    typeof left.toDisplayString === "function"
+    typeof left.toString === "function"
+      ? left.toString()
+      : typeof left.toDisplayString === "function"
       ? left.toDisplayString()
-      : left.toString();
+      : String(left);
 
   const rightStr =
-    typeof right.toDisplayString === "function"
+    typeof right.toString === "function"
+      ? right.toString()
+      : typeof right.toDisplayString === "function"
       ? right.toDisplayString()
-      : right.toString();
+      : String(right);
 
   steps.push({
     kind: "transform",
@@ -59,11 +66,15 @@ export function solveEquation(eq, steps = []) {
   });
 
   const diff = left.subtract(right);
-  const diffStr =
-    typeof diff.toDisplayString === "function"
-      ? diff.toDisplayString()
-      : diff.toString();
 
+  const diffStr =
+    typeof diff.toString === "function"
+      ? diff.toString()
+      : typeof diff.toDisplayString === "function"
+      ? diff.toDisplayString()
+      : String(diff);
+
+  // اگر مرحله «هم‌ارز کردن دو طرف معادله» را بعداً دوباره فعال کردی:
   // steps.push({
   //   kind: "transform",
   //   title: "هم‌ارز کردن دو طرف معادله",
@@ -90,8 +101,15 @@ export function solveEquation(eq, steps = []) {
   }
 
   const minusB = b.negate();
-  const axEqMinusB = `${a.toString()}${variable} = ${minusB.toString()}`;
 
+  const aStr =
+    typeof a.toString === "function" ? a.toString() : String(a);
+  const minusBStr =
+    typeof minusB.toString === "function" ? minusB.toString() : String(minusB);
+
+  const axEqMinusB = `${aStr}${variable} = ${minusBStr}`;
+
+  // اگر این مرحله را فعال کنی، متن توضیحش قبلاً با لحن آموزشی تنظیم شده بود:
   // steps.push({
   //   kind: "transform",
   //   title: "رسیدن به شکل مناسب برای پیدا کردن مقدار متغیر",
@@ -101,18 +119,21 @@ export function solveEquation(eq, steps = []) {
   //   to: axEqMinusB,
   // });
 
-const x = minusB.divide(a);
-const solutionStr = `${variable} = ${x.toString()}`;
+  const x = minusB.divide(a);
 
-steps.push({
-  kind: "solution",
-  title: "پیدا کردن مقدار متغیر",
-  description:
-    `برای پیدا کردن مقدار ${variable}، عددِ سمت دیگر مساوی یعنی ${minusB.toString()} را بر ضریب متغیر یعنی ${a.toString()} تقسیم می‌کنیم؛ بنابراین ${solutionStr}.`,
-  from: axEqMinusB,
-  to: solutionStr,
-});
+  const xStr =
+    typeof x.toString === "function" ? x.toString() : String(x);
 
+  const solutionStr = `${variable} = ${xStr}`;
+
+  steps.push({
+    kind: "solution",
+    title: "پیدا کردن مقدار متغیر",
+    description:
+      `برای پیدا کردن مقدار ${variable}، عددِ سمت دیگر مساوی یعنی ${minusBStr} را بر ضریب متغیر یعنی ${aStr} تقسیم می‌کنیم؛ بنابراین ${solutionStr}.`,
+    from: axEqMinusB,
+    to: solutionStr,
+  });
 
   return solutionStr;
 }

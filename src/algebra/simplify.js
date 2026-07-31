@@ -89,7 +89,15 @@ export function simplify(expr, steps = []) {
 
   try {
     poly = parsePolynomial(expr);
-    result = poly.toDisplayString();
+
+    // برای مراحل، نسخهٔ پایه را از toString می‌گیریم تا اطلاعات کامل حفظ شود.
+    if (typeof poly.toString === "function") {
+      result = poly.toString();
+    } else if (typeof poly.toDisplayString === "function") {
+      result = poly.toDisplayString();
+    } else {
+      result = String(poly);
+    }
   } catch (e) {
     addInfoStep(steps, {
       title: "خطا در ساده‌سازی",
@@ -102,10 +110,15 @@ export function simplify(expr, steps = []) {
     return expr;
   }
 
+  // اصلاح: بعضی stepها از فیلد kind استفاده می‌کنند، بعضی type.
   const lastTransformTo =
     [...steps]
       .reverse()
-      .find((s) => s.type === "transform" && s.to)?.to || expr;
+      .find(
+        (s) =>
+          (s.kind === "transform" || s.type === "transform") &&
+          typeof s.to === "string",
+      )?.to || expr;
 
   if (result !== lastTransformTo) {
     addTransformStep(steps, {
@@ -122,7 +135,7 @@ export function simplify(expr, steps = []) {
     addTransformStep(steps, {
       title: "ساده‌سازی عبارت",
       description:
-        "عبارت به کمک موتور چندجمله‌ای محاسبه شده و جمله‌های هم‌نوع با یکدیگر ترکیب می‌شوند.",
+        "عبارت به کمک موتور چندجمله‌ای محاسبه شده و جمله‌های متشابه با یکدیگر ترکیب می‌شوند.",
       from: expr,
       to: result,
       meta: {
