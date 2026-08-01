@@ -94,6 +94,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function makeReadonlyMathField(latex) {
     const mf = document.createElement("math-field");
+
     mf.setAttribute("read-only", "true");
     mf.setAttribute("dir", "ltr");
 
@@ -103,12 +104,37 @@ document.addEventListener("DOMContentLoaded", () => {
     mf.style.borderRadius = "12px";
     mf.style.padding = "10px 12px";
     mf.style.background = "#f9fafb";
-    mf.style.width = "100%";
+
+    /*
+     * مهم:
+     * عرض math-field نباید 100 درصد باشد.
+     * عرض آن باید به اندازه عبارت ریاضی باشد تا wrapper بتواند
+     * پیمایش افقی ایجاد کند.
+     */
+    mf.style.width = "max-content";
+    mf.style.minWidth = "max-content";
+    mf.style.maxWidth = "none";
+
+    mf.style.display = "inline-block";
+    mf.style.whiteSpace = "nowrap";
     mf.style.fontSize = "1.05rem";
     mf.style.outline = "none";
 
     mf.value = latex || "";
+
     return mf;
+  }
+
+  function createMathScrollArea(latex) {
+    const scrollArea = document.createElement("div");
+    scrollArea.className = "math-scroll-area";
+    scrollArea.setAttribute("dir", "ltr");
+
+    const mathField = makeReadonlyMathField(latex);
+
+    scrollArea.appendChild(mathField);
+
+    return scrollArea;
   }
 
   function linearToLatexSafe(linear) {
@@ -204,17 +230,24 @@ document.addEventListener("DOMContentLoaded", () => {
       if (from) {
         const row = document.createElement("div");
         row.className = "jabrino-math-row";
-        row.appendChild(makeReadonlyMathField(linearToLatexSafe(from)));
+
+        const fromScrollArea = createMathScrollArea(linearToLatexSafe(from));
+
+        row.appendChild(fromScrollArea);
         mathBox.appendChild(row);
       }
+
       if (to) {
         const row = document.createElement("div");
         row.className = "jabrino-math-row";
-        row.appendChild(makeReadonlyMathField(linearToLatexSafe(to)));
+
+        const toScrollArea = createMathScrollArea(linearToLatexSafe(to));
+
+        row.appendChild(toScrollArea);
         mathBox.appendChild(row);
       }
     } else if (shown) {
-      mathBox.appendChild(makeReadonlyMathField(linearToLatexSafe(shown)));
+      mathBox.appendChild(createMathScrollArea(linearToLatexSafe(shown)));
     } else {
       mathBox.innerHTML = `<div class="jabrino-step-empty">—</div>`;
     }
@@ -597,4 +630,34 @@ document.addEventListener("DOMContentLoaded", () => {
   initHelpModalMath();
 
   editor.onEnter(window.solve);
+});
+
+document.addEventListener("pointerdown", (event) => {
+  const scrollArea = event.target.closest(".math-scroll-area");
+
+  if (!scrollArea) return;
+
+  const startX = event.clientX;
+  const startScrollLeft = scrollArea.scrollLeft;
+
+  let isDragging = true;
+
+  const move = (moveEvent) => {
+    if (!isDragging) return;
+
+    const distance = moveEvent.clientX - startX;
+    scrollArea.scrollLeft = startScrollLeft - distance;
+  };
+
+  const stop = () => {
+    isDragging = false;
+
+    document.removeEventListener("pointermove", move);
+    document.removeEventListener("pointerup", stop);
+    document.removeEventListener("pointercancel", stop);
+  };
+
+  document.addEventListener("pointermove", move);
+  document.addEventListener("pointerup", stop);
+  document.addEventListener("pointercancel", stop);
 });

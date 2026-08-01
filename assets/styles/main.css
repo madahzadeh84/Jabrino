@@ -318,21 +318,21 @@ button {
 }
 /* حذف کادر و سایه اضافی برای فرمول‌های داخل متن */
 #helpModal code math-field {
-    border: none !important;
-    outline: none !important;
-    background: transparent !important;
-    box-shadow: none !important;
-    --contains-highlight-backround: transparent;
-    --idle-shadow: none;
-    --focus-shadow: none;
+  border: none !important;
+  outline: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  --contains-highlight-backround: transparent;
+  --idle-shadow: none;
+  --focus-shadow: none;
 }
 
 /* جلوگیری از اشغال فضای اضافی در ارتفاع خط */
 #helpModal code {
-    background: none;
-    border: none;
-    padding: 0;
-    white-space: nowrap; /* جلوگیری از شکستن فرمول به دو خط */
+  background: none;
+  border: none;
+  padding: 0;
+  white-space: nowrap; /* جلوگیری از شکستن فرمول به دو خط */
 }
 
 /* به‌روزرسانی استایل کادر مثال‌های راهنما جهت پذیرش فرمول ریاضی */
@@ -380,7 +380,6 @@ button {
 .history-expr-clickable:hover {
   transform: translateY(-1px);
 }
-
 
 .bad-example {
   border-radius: 10px;
@@ -560,7 +559,12 @@ button {
 
 /* خود کیبورد کلی */
 math-field::part(virtual-keyboard) {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Vazirmatn", sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Vazirmatn",
+    sans-serif;
   direction: ltr;
   width: 100%;
   max-width: 480px;
@@ -850,7 +854,7 @@ math-field::part(virtual-keyboard-key).ML__hide {
 .about-top-brand-btn {
   position: fixed;
   top: 12px;
-  right: 16px;        /* اگر ترجیح می‌دهی بالا چپ باشد، این را به left تغییر بده */
+  right: 16px; /* اگر ترجیح می‌دهی بالا چپ باشد، این را به left تغییر بده */
   z-index: 60;
 
   padding: 6px 14px;
@@ -949,3 +953,381 @@ math-field::part(virtual-keyboard-key).ML__hide {
   color: #555;
 }
 
+/* هیچ بخش از مراحل نباید عرض صفحه را بیشتر کند */
+#steps,
+.steps-container,
+.jabrino-step-card,
+.jabrino-step-body,
+.jabrino-step-math {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+/* کادر مخصوص حرکت افقی عبارت ریاضی */
+.math-scroll-area {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  direction: ltr;
+  text-align: left;
+  cursor: grab;
+  touch-action: pan-x;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  padding: 4px 2px 10px;
+}
+
+/* هنگام گرفتن و کشیدن با موس */
+.math-scroll-area:active {
+  cursor: grabbing;
+}
+
+/* عبارت نباید به خط بعد برود و باید فقط در راستای افقی ادامه پیدا کند */
+.math-scroll-area math-field {
+  display: inline-block;
+  width: max-content !important;
+  min-width: max-content !important;
+  max-width: none !important;
+
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+
+  white-space: nowrap;
+  font-size: 18px;
+}
+
+/* ظاهر نوار پیمایش در مرورگرهای Chromium مانند Chrome */
+.math-scroll-area::-webkit-scrollbar {
+  height: 6px;
+}
+
+.math-scroll-area::-webkit-scrollbar-track {
+  background: #e5e7eb;
+  border-radius: 6px;
+}
+
+.math-scroll-area::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 6px;
+}
+
+.math-scroll-area::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+@media (max-width: 768px) {
+  body {
+    overflow-x: hidden;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 520px;
+    padding: 24px 14px;
+  }
+
+  .jabrino-step-card {
+    overflow: hidden;
+    padding: 12px;
+  }
+
+  .jabrino-step-body {
+    display: block;
+  }
+
+  .jabrino-step-text {
+    margin-bottom: 10px;
+  }
+
+  .math-scroll-area math-field {
+    font-size: 16px;
+  }
+}
+
+/* جلوگیری از بزرگ شدن کارت مراحل */
+#steps,
+.jabrino-step-card,
+.jabrino-step-body,
+.jabrino-step-text,
+.jabrino-step-math,
+.jabrino-math-row,
+.math-scroll-area {
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* کادر قابل پیمایش */
+.jabrino-step-math {
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  direction: ltr;
+  text-align: left;
+}
+
+.jabrino-math-row {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  margin-bottom: 10px;
+}
+
+/*
+ * این بخش باید پیمایش افقی داشته باشد.
+ * عبارت داخل آن در یک خط باقی می ماند.
+ */
+.math-scroll-area {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  direction: ltr;
+  text-align: left;
+
+  padding: 4px 2px 10px;
+  touch-action: pan-x;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+
+  cursor: grab;
+  scrollbar-width: thin;
+}
+
+.math-scroll-area:active {
+  cursor: grabbing;
+}
+
+/*
+ * math-field باید از عرض کادر بزرگ تر شود،
+ * نه اینکه خودش را داخل عرض کادر جمع کند.
+ */
+.math-scroll-area > math-field {
+  display: inline-block !important;
+
+  width: max-content !important;
+  min-width: max-content !important;
+  max-width: none !important;
+
+  white-space: nowrap !important;
+
+  margin: 0 !important;
+  font-size: 18px;
+}
+
+/* نوار پیمایش در Chrome و Edge */
+.math-scroll-area::-webkit-scrollbar {
+  height: 7px;
+}
+
+.math-scroll-area::-webkit-scrollbar-track {
+  background: #e5e7eb;
+  border-radius: 8px;
+}
+
+.math-scroll-area::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 8px;
+}
+
+.math-scroll-area::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+@media (max-width: 768px) {
+  body {
+    overflow-x: hidden;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 520px;
+    min-width: 0;
+  }
+
+  .jabrino-step-card {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .jabrino-step-body {
+    display: block;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .jabrino-step-text {
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .jabrino-step-math {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .math-scroll-area > math-field {
+    font-size: 16px;
+  }
+}
+
+/* هر سطر عبارت در مراحل، تمام عرض کارت را می گیرد */
+.jabrino-math-row {
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+/*
+ * خود کانتینر عبارت:
+ * همیشه تمام عرض مرحله را می گیرد و در صورت بلند بودن عبارت،
+ * فقط محتوای آن به صورت افقی پیمایش می شود.
+ */
+.jabrino-step-math .math-scroll-area {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+
+  min-height: 74px;
+  padding: 10px 12px;
+
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  direction: ltr;
+  text-align: left;
+  touch-action: pan-x;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+
+  cursor: grab;
+  background: #f9fafb;
+  border: 1px dashed #d1d5db;
+  border-radius: 12px;
+}
+
+.jabrino-step-math .math-scroll-area:active {
+  cursor: grabbing;
+}
+
+/*
+ * خود MathLive فقط نمایش دهنده عبارت است.
+ * کادر، رنگ زمینه و عرض کامل متعلق به math-scroll-area هستند.
+ */
+.jabrino-step-math .math-scroll-area > math-field {
+  display: inline-block !important;
+  width: max-content !important;
+  min-width: max-content !important;
+  max-width: none !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  border: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+
+  white-space: nowrap !important;
+  font-size: 18px !important;
+}
+
+/* فاصله اضافی پس از آخرین عبارت یک مرحله */
+.jabrino-math-row:last-child {
+  margin-bottom: 0;
+}
+
+/* نوار پیمایش افقی در Chrome ، Edge و مرورگرهای هم خانواده */
+.jabrino-step-math .math-scroll-area::-webkit-scrollbar {
+  height: 6px;
+}
+
+.jabrino-step-math .math-scroll-area::-webkit-scrollbar-track {
+  background: #e5e7eb;
+  border-radius: 6px;
+}
+
+.jabrino-step-math .math-scroll-area::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 6px;
+}
+
+.jabrino-step-math .math-scroll-area::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+@media (max-width: 768px) {
+  .jabrino-step-math .math-scroll-area {
+    min-height: 66px;
+    padding: 9px 10px;
+  }
+
+  .jabrino-step-math .math-scroll-area > math-field {
+    font-size: 16px !important;
+  }
+}
+.jabrino-step-math .math-scroll-area {
+  display: flex;
+  align-items: center;
+
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  height: 74px;
+  box-sizing: border-box;
+
+  padding: 10px 12px;
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  direction: ltr;
+  text-align: left;
+  touch-action: pan-x;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+
+  cursor: grab;
+  background: #f9fafb;
+  border: 1px dashed #d1d5db;
+  border-radius: 12px;
+}
+
+.jabrino-step-math .math-scroll-area > math-field {
+  display: inline-block !important;
+  width: max-content !important;
+  min-width: max-content !important;
+  max-width: none !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  font-size: 18px !important;
+}
+
+@media (max-width: 768px) {
+  .jabrino-step-math .math-scroll-area {
+    height: 66px;
+    padding: 9px 10px;
+  }
+
+  .jabrino-step-math .math-scroll-area > math-field {
+    font-size: 16px !important;
+  }
+}
