@@ -948,3 +948,74 @@ math-field::part(virtual-keyboard-key).ML__hide {
   font-size: 0.95rem;
   color: #555;
 }
+
+/* جلوگیری از بیرون زدن کارت های مراحل در صفحه های کوچک */
+.jabrino-step-card,
+.jabrino-step-header,
+.jabrino-step-body,
+.jabrino-step-text,
+.jabrino-step-math {
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* عبارت ریاضی بلند، فقط در کادر خودش افقی پیمایش می شود */
+.jabrino-step-math {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding: 2px 0 8px;
+  scrollbar-width: thin;
+}
+
+/* MathLive نباید کل کارت را عریض کند */
+.jabrino-step-math math-field {
+  display: block;
+  width: max-content;
+  min-width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  font-size: 18px;
+}
+
+/* کارت ها همیشه از عرض صفحه بیشتر نمی شوند */
+@media (max-width: 768px) {
+  body {
+    display: block;
+    padding: 12px;
+    overflow-x: hidden;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 24px 14px;
+    border-radius: 14px;
+  }
+
+  .jabrino-step-card {
+    width: 100%;
+    padding: 12px;
+    overflow: hidden;
+  }
+
+  .jabrino-step-body {
+    display: block;
+    width: 100%;
+  }
+
+  .jabrino-step-text {
+    margin-bottom: 10px;
+  }
+
+  .jabrino-step-math {
+    direction: ltr;
+    text-align: left;
+  }
+}
