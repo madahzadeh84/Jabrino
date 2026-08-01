@@ -15,6 +15,7 @@ import { evalNumeric } from "../core/numericEval.js";
 document.addEventListener("DOMContentLoaded", () => {
   const editor = new MathEditor("mathInput", "miniKbd");
   const history = new HistoryManager();
+  initHelpModalMath();
 
   const resultDiv = document.getElementById("result");
   const stepsDiv = document.getElementById("steps");
@@ -565,6 +566,323 @@ document.addEventListener("DOMContentLoaded", () => {
       aboutModal.classList.remove("hide");
     }, 220);
   };
+  // ---------------------------
+  // بخش ریاضی دانان
+  // دریافت خودکار داده از ویکی پدیای فارسی
+  // ---------------------------
+  const mathematiciansModal = document.getElementById("mathematiciansModal");
+  const mathematiciansBtn = document.getElementById("mathematiciansBtn");
+  const closeMathematiciansBtn = document.getElementById("closeMathematicians");
+  const mathematicianSearchInput = document.getElementById(
+    "mathematicianSearchInput",
+  );
+  const mathematicianSearchBtn = document.getElementById(
+    "mathematicianSearchBtn",
+  );
+  const mathematicianList = document.getElementById("mathematicianList");
+  const mathematicianDetail = document.getElementById("mathematicianDetail");
+  const mathematicianStatus = document.getElementById("mathematicianStatus");
+
+  const defaultMathematicians = [
+    "محمد بن موسی خوارزمی",
+    "عمر خیام",
+    "اقلیدس",
+    "رنه دکارت",
+    "مریم میرزاخانی",
+    "غیاث الدین جمشید کاشانی",
+  ];
+  const mathematicianDetailModal = document.getElementById(
+    "mathematicianDetailModal",
+  );
+  const mathematicianDetailContent = document.getElementById(
+    "mathematicianDetailContent",
+  );
+  const closeMathematicianDetailBtn = document.getElementById(
+    "closeMathematicianDetail",
+  );
+
+  function setMathematicianStatus(message = "", type = "") {
+    if (!mathematicianStatus) return;
+
+    mathematicianStatus.textContent = message;
+    mathematicianStatus.className = "mathematician-status";
+
+    if (type) {
+      mathematicianStatus.classList.add(`status-${type}`);
+    }
+  }
+
+  function getWikipediaSearchUrl(searchText) {
+    const params = new URLSearchParams({
+      action: "query",
+      format: "json",
+      origin: "*",
+      generator: "search",
+      gsrsearch: searchText,
+      gsrnamespace: "0",
+      gsrlimit: "12",
+      prop: "extracts|pageimages|info",
+      exintro: "1",
+      explaintext: "1",
+      piprop: "thumbnail",
+      pithumbsize: "420",
+      inprop: "url",
+    });
+
+    return `https://fa.wikipedia.org/w/api.php?${params.toString()}`;
+  }
+
+  function normalizeWikipediaPages(data) {
+    const pages = Object.values(data?.query?.pages || {});
+
+    return pages
+      .filter((page) => page && page.title && page.pageid > 0)
+      .sort((first, second) => {
+        const firstIndex = Number(first.index || 9999);
+        const secondIndex = Number(second.index || 9999);
+        return firstIndex - secondIndex;
+      });
+  }
+
+  function createMathematicianCard(page) {
+    const card = document.createElement("article");
+    card.className = "mathematician-card";
+    card.tabIndex = 0;
+    card.setAttribute("role", "button");
+    card.setAttribute("aria-label", `نمایش اطلاعات ${page.title}`);
+
+    const imageUrl = page.thumbnail?.source || "";
+    const excerpt = page.extract || "خلاصه ای برای این صفحه در دسترس نیست.";
+
+    card.innerHTML = `
+      <div class="mathematician-card-image">
+        ${
+          imageUrl
+            ? `<img src="${escapeHtml(imageUrl)}" alt="تصویر ${escapeHtml(page.title)}">`
+            : `<span class="mathematician-image-placeholder" aria-hidden="true">∑</span>`
+        }
+      </div>
+
+      <div class="mathematician-card-content">
+        <h3>${escapeHtml(page.title)}</h3>
+        <p>${escapeHtml(excerpt)}</p>
+      </div>
+    `;
+
+    const openDetail = () => renderMathematicianDetail(page);
+
+    card.addEventListener("click", openDetail);
+    card.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        openDetail();
+      }
+    });
+
+    return card;
+  }
+
+  function renderMathematicianDetail(page) {
+    if (!mathematicianDetailModal || !mathematicianDetailContent) return;
+
+    const title = page.title || "بدون عنوان";
+    const description =
+      page.extract ||
+      "برای این ریاضی دان، توضیح کاملی در ویکی پدیای فارسی پیدا نشد.";
+
+    const imageUrl = page.thumbnail?.source;
+    const wikipediaUrl = page.fullurl || "#";
+
+    mathematicianDetailContent.innerHTML = `
+    <section class="mathematician-detail-view" dir="rtl">
+      ${
+        imageUrl
+          ? `<img
+              class="mathematician-detail-image"
+              src="${imageUrl}"
+              alt="تصویر ${title}"
+            />`
+          : ""
+      }
+
+      <h2>${title}</h2>
+
+      <p>${description}</p>
+
+      ${
+        wikipediaUrl !== "#"
+          ? `<a
+              class="mathematician-source-link"
+              href="${wikipediaUrl}"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              مشاهده صفحه کامل در ویکی پدیای فارسی
+            </a>`
+          : ""
+      }
+    </section>
+  `;
+
+    mathematicianDetailModal.style.display = "flex";
+
+    requestAnimationFrame(() => {
+      mathematicianDetailModal.classList.add("show");
+    });
+  }
+
+  function renderMathematicianResults(pages) {
+    if (!mathematicianList) return;
+
+    mathematicianList.innerHTML = "";
+    mathematicianDetail.hidden = true;
+    mathematicianList.hidden = false;
+
+    if (pages.length === 0) {
+      setMathematicianStatus(
+        "نتیجه ای پیدا نشد. نام را با شکل دیگری وارد کنید.",
+        "error",
+      );
+      return;
+    }
+
+    setMathematicianStatus(`${pages.length} نتیجه پیدا شد.`, "success");
+
+    pages.forEach((page) => {
+      mathematicianList.appendChild(createMathematicianCard(page));
+    });
+  }
+
+  async function searchMathematicians(searchText) {
+    const query = String(searchText || "").trim();
+
+    if (!query) {
+      setMathematicianStatus("ابتدا نام یک ریاضی دان را وارد کنید.", "error");
+      return;
+    }
+
+    setMathematicianStatus("در حال دریافت اطلاعات...", "loading");
+
+    if (mathematicianSearchBtn) {
+      mathematicianSearchBtn.disabled = true;
+      mathematicianSearchBtn.textContent = "در حال جستجو";
+    }
+
+    try {
+      const response = await fetch(getWikipediaSearchUrl(query));
+
+      if (!response.ok) {
+        throw new Error("ارتباط با منبع اطلاعات برقرار نشد.");
+      }
+
+      const data = await response.json();
+      const pages = normalizeWikipediaPages(data);
+
+      renderMathematicianResults(pages);
+    } catch (error) {
+      console.error("خطا در دریافت اطلاعات ریاضی دانان:", error);
+      setMathematicianStatus(
+        "دریافت اطلاعات انجام نشد. اتصال اینترنت را بررسی کنید و دوباره تلاش کنید.",
+        "error",
+      );
+    } finally {
+      if (mathematicianSearchBtn) {
+        mathematicianSearchBtn.disabled = false;
+        mathematicianSearchBtn.textContent = "جستجو";
+      }
+    }
+  }
+
+  function renderDefaultMathematicians() {
+    if (!mathematicianList) return;
+
+    mathematicianDetail.hidden = true;
+    mathematicianList.hidden = false;
+    mathematicianList.innerHTML = "";
+
+    setMathematicianStatus(
+      "یک نام را انتخاب کنید یا نام دلخواه خود را جستجو کنید.",
+    );
+
+    defaultMathematicians.forEach((name) => {
+      const button = document.createElement("button");
+      button.className = "mathematician-suggestion-btn";
+      button.type = "button";
+      button.textContent = name;
+
+      button.addEventListener("click", () => {
+        if (mathematicianSearchInput) {
+          mathematicianSearchInput.value = name;
+        }
+
+        searchMathematicians(name);
+      });
+
+      mathematicianList.appendChild(button);
+    });
+  }
+
+  window.openMathematiciansModal = () => {
+    if (!mathematiciansModal) return;
+
+    mathematiciansModal.classList.remove("hide");
+    mathematiciansModal.classList.add("show");
+    mathematiciansModal.style.display = "flex";
+
+    if (mathematicianSearchInput) {
+      mathematicianSearchInput.value = "";
+    }
+
+    renderDefaultMathematicians();
+
+    setTimeout(() => {
+      mathematicianSearchInput?.focus();
+    }, 250);
+  };
+
+  window.closeMathematiciansModal = () => {
+    if (!mathematiciansModal) return;
+
+    mathematiciansModal.classList.remove("show");
+    mathematiciansModal.classList.add("hide");
+
+    setTimeout(() => {
+      mathematiciansModal.style.display = "none";
+      mathematiciansModal.classList.remove("hide");
+    }, 220);
+  };
+
+  mathematiciansBtn?.addEventListener("click", window.openMathematiciansModal);
+
+  closeMathematiciansBtn?.addEventListener(
+    "click",
+    window.closeMathematiciansModal,
+  );
+
+  mathematicianSearchBtn?.addEventListener("click", () => {
+    searchMathematicians(mathematicianSearchInput?.value);
+  });
+  window.closeMathematicianDetailModal = () => {
+    if (!mathematicianDetailModal) return;
+
+    mathematicianDetailModal.classList.remove("show");
+    mathematicianDetailModal.classList.add("hide");
+
+    setTimeout(() => {
+      mathematicianDetailModal.style.display = "none";
+      mathematicianDetailModal.classList.remove("hide");
+    }, 220);
+  };
+
+  closeMathematicianDetailBtn?.addEventListener("click", () => {
+    window.closeMathematicianDetailModal();
+  });
+
+  mathematicianSearchInput?.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      searchMathematicians(mathematicianSearchInput.value);
+    }
+  });
 
   document
     .getElementById("helpBtn")
@@ -616,6 +934,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.target === helpModal) window.closeHelpModal();
     if (e.target === historyModal) window.closeHistoryModal();
     if (e.target === aboutModal) window.closeAboutModal();
+
+    if (e.target === mathematiciansModal) {
+      window.closeMathematiciansModal();
+    }
   });
 
   window.addEventListener("keydown", (e) => {
@@ -623,6 +945,13 @@ document.addEventListener("DOMContentLoaded", () => {
       if (helpModal?.classList.contains("show")) window.closeHelpModal();
       if (historyModal?.classList.contains("show")) window.closeHistoryModal();
       if (aboutModal?.classList.contains("show")) window.closeAboutModal();
+
+      if (mathematiciansModal?.classList.contains("show")) {
+        window.closeMathematiciansModal();
+      }
+      if (mathematicianDetailModal?.classList.contains("show")) {
+        window.closeMathematicianDetailModal();
+      }
     }
   });
 

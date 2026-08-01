@@ -16,6 +16,10 @@
     <button id="aboutBtn" class="about-top-brand-btn" type="button" aria-label="درباره جبرینو">
         <span>درباره ما</span>
     </button>
+    <button id="mathematiciansBtn" class="about-top-brand-btn" type="button" aria-label="ریاضی دانان">
+        <span>ریاضی دانان</span>
+    </button>
+
 
     <div class="container">
 
@@ -285,6 +289,45 @@
 
             </div>
         </div>
+        <!-- مودال ریاضی دانان -->
+        <div id="mathematiciansModal" class="modal mathematicians-modal">
+            <div class="modal-content mathematicians-modal-content">
+                <button id="closeMathematicians" class="close-btn" type="button" aria-label="بستن بخش ریاضی دانان">
+                    <span>✕</span>
+                </button>
+
+                <h2>ریاضی دانان</h2>
+
+                <p class="mathematicians-intro">
+                    نام یک ریاضی دان را جستجو کنید تا اطلاعات او از ویکی پدیای فارسی نمایش داده شود.
+                </p>
+
+                <div class="mathematician-search-bar">
+                    <input id="mathematicianSearchInput" type="search"
+                        placeholder="برای نمونه: خوارزمی، مریم میرزاخانی یا اقلیدس" autocomplete="off">
+                    <button id="mathematicianSearchBtn" type="button">
+                        جستجو
+                    </button>
+                </div>
+
+                <div id="mathematicianStatus" class="mathematician-status" aria-live="polite"></div>
+
+                <div id="mathematicianList" class="mathematician-list"></div>
+
+                <section id="mathematicianDetail" class="mathematician-detail" hidden></section>
+            </div>
+<div id="mathematicianDetailModal" class="modal mathematician-detail-modal">
+    <div class="modal-content mathematician-detail-modal-content">
+        <!-- کلاس دکمه به mathematician-detail-close-btn تغییر کرد -->
+        <button id="closeMathematicianDetail" class="mathematician-detail-close-btn" type="button" aria-label="بستن">
+            &times;
+        </button>
+
+        <div id="mathematicianDetailContent"></div>
+    </div>
+</div>
+
+
 
         <div id="result"></div>
         <button id="stepsBtn" onclick="toggleSteps()" style="display:none">
@@ -293,6 +336,7 @@
 
         <div id="steps" class="steps-container" style="display:none"></div>
         <div id="error"></div>
+
     </div>
 
     <div class="iran-footer-bar">
