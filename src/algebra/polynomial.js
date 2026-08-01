@@ -49,7 +49,7 @@ export class Polynomial {
         // تبدیل توان‌های زوج: sqrt(n)^2m = n^m
         const multiplier = Math.pow(insideValue, evenPower);
         coeffFactor = coeffFactor.multiply(new Fraction(multiplier));
-        
+
         if (remainder === 0) {
           delete newVars[name];
         } else {
@@ -101,7 +101,8 @@ export class Polynomial {
         }
 
         // --- بخش اصلاح شده: اعمال ساده‌سازی رادیکال‌ها ---
-        const { vars, coeffFactor } = Polynomial.simplifyRadicalVars(combinedVars);
+        const { vars, coeffFactor } =
+          Polynomial.simplifyRadicalVars(combinedVars);
         currentCoeff = currentCoeff.multiply(coeffFactor);
         const finalVars = vars;
         // ----------------------------------------------
@@ -272,7 +273,6 @@ export class Polynomial {
       const degA = Object.values(a.vars).reduce((s, x) => s + x, 0);
       const degB = Object.values(b.vars).reduce((s, x) => s + x, 0);
       if (degB !== degA) return degB - degA;
-
       const keyA = Polynomial.varsKey(a.vars);
       const keyB = Polynomial.varsKey(b.vars);
       return keyA.localeCompare(keyB);
@@ -287,20 +287,20 @@ export class Polynomial {
       const isNegative = coeff.num < 0;
       const absCoeff = new Fraction(Math.abs(coeff.num), coeff.den);
 
+      // ساخت بخش متغیر بدون علامت *
       const varPart = Object.keys(term.vars)
         .sort()
         .map((v) => (term.vars[v] === 1 ? v : `${v}^${term.vars[v]}`))
-        .join("*");
+        .join(""); // حذف * بین متغیرها (مثلاً xy به جای x*y)
 
       let piece = "";
 
       if (varPart) {
         if (absCoeff.num === 1 && absCoeff.den === 1) {
           piece = varPart;
-        } else if (absCoeff.den === 1) {
-          piece = `${absCoeff.num}*${varPart}`;
         } else {
-          piece = `(${absCoeff.toString()})*${varPart}`;
+          // کسرها بدون پرانتز و بدون علامت ضرب
+          piece = `${absCoeff.toString()}${varPart}`;
         }
       } else {
         piece = absCoeff.toString();
