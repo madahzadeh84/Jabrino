@@ -266,7 +266,53 @@ export class Polynomial {
   }
 
   toDisplayString() {
-    // ... باقی‌مانده کد مشابه toString است و تغییری نکرده ...
-    return this.toString(); 
+    if (this.terms.length === 0) return "0";
+
+    const sorted = [...this.terms].sort((a, b) => {
+      const degA = Object.values(a.vars).reduce((s, x) => s + x, 0);
+      const degB = Object.values(b.vars).reduce((s, x) => s + x, 0);
+      if (degB !== degA) return degB - degA;
+
+      const keyA = Polynomial.varsKey(a.vars);
+      const keyB = Polynomial.varsKey(b.vars);
+      return keyA.localeCompare(keyB);
+    });
+
+    let result = "";
+
+    sorted.forEach((term, index) => {
+      let coeff = term.coeff;
+      if (coeff.isZero()) return;
+
+      const isNegative = coeff.num < 0;
+      const absCoeff = new Fraction(Math.abs(coeff.num), coeff.den);
+
+      const varPart = Object.keys(term.vars)
+        .sort()
+        .map((v) => (term.vars[v] === 1 ? v : `${v}^${term.vars[v]}`))
+        .join("*");
+
+      let piece = "";
+
+      if (varPart) {
+        if (absCoeff.num === 1 && absCoeff.den === 1) {
+          piece = varPart;
+        } else if (absCoeff.den === 1) {
+          piece = `${absCoeff.num}*${varPart}`;
+        } else {
+          piece = `(${absCoeff.toString()})*${varPart}`;
+        }
+      } else {
+        piece = absCoeff.toString();
+      }
+
+      if (index === 0) {
+        result += isNegative ? "-" + piece : piece;
+      } else {
+        result += isNegative ? " - " + piece : " + " + piece;
+      }
+    });
+
+    return result || "0";
   }
 }

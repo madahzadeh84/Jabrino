@@ -56,6 +56,8 @@ export default class MathAdapter {
     ")": ")",
   };
 
+  // --- رنگ‌دهی متغیرها ---
+
   static normalizeVariableName(name) {
     const raw = String(name || "").trim();
     if (!raw) return "";
@@ -67,11 +69,12 @@ export default class MathAdapter {
   }
 
   static isSqrtVirtualVariable(name) {
-    return /^sqrt\(.+\)$/.test(name);
+    const str = String(name || "");
+    return /^sqrt\(.+\)$/.test(str);
   }
 
   static sqrtVirtualVariableToLatex(name) {
-    const inner = name.slice(5, -1);
+    const inner = String(name || "").slice(5, -1);
     return `\\sqrt{${this.linearToLatex(inner)}}`;
   }
 
@@ -128,8 +131,6 @@ export default class MathAdapter {
     return `\\textcolor{${color}}{${normalized}}`;
   }
 
-  // بخشی از MathAdapter.js
-
   static tokenToLatex(token) {
     if (token.type === "NUM") return token.value.toString();
     if (token.type === "VAR") return this.colorizeVariable(token.value);
@@ -137,26 +138,13 @@ export default class MathAdapter {
       if (token.value === "*") return "\\cdot ";
       return token.value;
     }
-    // هماهنگی با نوع FN
     if (token.type === "FN" && token.value === "sqrt") {
       return "\\sqrt";
     }
     return token.value;
   }
 
-  // برای رادیکال‌های نمادین که به صورت متغیر مجازی در چندجمله‌ای مانده‌اند
-  static isSqrtVirtualVariable(name) {
-    return typeof name === "string" && name.startsWith("sqrt(");
-  }
-
-  static sqrtVirtualVariableToLatex(name) {
-    const inner = name.slice(5, -1);
-    // تبدیل بازگشتی داخل رادیکال به لاتک (مثلاً برای رادیکال‌های مرکب)
-    return `\\sqrt{${this.linearToLatex(inner)}}`;
-  }
-  // -----------------------------
-  // Helpers for parsing LaTeX commands like \frac and \sqrt
-  // -----------------------------
+  // --- کمک‌تابع‌های لاتک → رشته خطی ---
 
   static findMatchingGroup(str, startIndex, openChar = "{", closeChar = "}") {
     if (!str || str[startIndex] !== openChar) return null;
@@ -192,7 +180,6 @@ export default class MathAdapter {
       return this.findMatchingGroup(str, startIndex, "(", ")");
     }
 
-    // No-brace single-token argument (e.g. \frac34, \sqrtx)
     return {
       start: startIndex,
       end: startIndex,
@@ -227,6 +214,8 @@ export default class MathAdapter {
           const arg2 = this.readLatexArgument(result, arg2Start);
           if (!arg2) continue;
 
+          // فعلا به صورت (صورت)/(مخرج) تبدیل می‌شود؛
+          // بعدا patternهای ضرب در متغیر را اصلاح می‌کنیم.
           const replacement = `(${arg1.content})/(${arg2.content})`;
           result =
             result.slice(0, i) + replacement + result.slice(arg2.end + 1);
@@ -265,9 +254,6 @@ export default class MathAdapter {
     return result;
   }
 
-  // -----------------------------
-  // LaTeX -> linear
-  // -----------------------------
   static latexToLinear(latex) {
     if (typeof latex !== "string") {
       return "";
@@ -275,41 +261,42 @@ export default class MathAdapter {
 
     let str = latex;
 
-    // 1) remove whitespace
+    // حذف فاصله‌ها و رنگ متغیرها
     str = str.replace(/\s+/g, "");
-
-    // 2) remove color wrapper: \textcolor{...}{...} -> inner
     str = str.replace(/\\textcolor{[^}]+}{([^}]*)}/g, "$1");
 
-    // 3) normalize \left...\right...
+    // حذف \left و \right
     str = str.replace(/\\left\(/g, "(").replace(/\\right\)/g, ")");
     str = str.replace(/\\left\[/g, "[").replace(/\\right\]/g, "]");
     str = str.replace(/\\left\\{/g, "{").replace(/\\right\\}/g, "}");
     str = str.replace(/\\left\./g, "").replace(/\\right\./g, "");
 
-    // 4) fractions: supports \frac{a}{b} and \fracab
+    // تبدیل \frac به (a)/(b)
     str = this.replaceLatexFractions(str);
 
-    // 5) sqrt: supports \sqrt{a} and \sqrta
+    // در همین‌جا الگوی \frac{a}{b}x را به (a/b)*x تبدیل می‌کنیم
+    // مثال: (3)/(4)x → (3/4)*x
+    str = str.replace(
+      /\(([^()]+)\)\/\(([^()]+)\)([A-Za-z][A-Za-z0-9_]*)/,
+      (_match, num, den, variable) => `(${num}/${den})*${variable}`,
+    );
+
+    // رادیکال‌ها
     str = this.replaceLatexSqrt(str);
 
-    // 6) multiply/divide commands
+    // تبدیل ضرب و تقسیم
     str = str.replace(/\\cdot/g, "*");
     str = str.replace(/\\times/g, "*");
     str = str.replace(/\\div/g, "/");
 
-    // 7) convert remaining braces to parentheses to keep grouping
+    // بستن براکت‌ها
     str = str.replace(/{/g, "(").replace(/}/g, ")");
-
-    // 8) remove remaining backslashes
     str = str.replace(/\\/g, "");
 
     return str;
   }
 
-  // -----------------------------
-  // linear -> LaTeX (for rendering + colors)
-  // -----------------------------
+  // --- کمک‌تابع‌های پرانتز و تشخیص مخرج ---
 
   static stripOuterParens(str) {
     const s = String(str || "").trim();
@@ -329,6 +316,39 @@ export default class MathAdapter {
     return s.slice(1, -1).trim();
   }
 
+  static isFullyParenWrapped(str) {
+    const s = String(str || "").trim();
+    if (!s.startsWith("(") || !s.endsWith(")")) return false;
+    return this.stripOuterParens(s) !== s;
+  }
+
+  /** مخرج کسر: متغیرهای ساده و مرکب با رنگ درست */
+  static linearToLatexDenominator(expr) {
+    const str = String(expr ?? "").trim();
+    if (!str) return "";
+
+    // اگر فقط یک متغیر ساده است، مستقیم رنگ‌دهی شود
+    if (/^[A-Za-z][A-Za-z0-9_]*$/.test(str)) {
+      return this.colorizeVariable(str);
+    }
+
+    // اگر مجازی sqrt(...) است
+    if (this.isSqrtVirtualVariable(str)) {
+      return this.sqrtVirtualVariableToLatex(str);
+    }
+
+    // در بقیه‌ی حالات، از همان منطق کلی استفاده می‌کنیم
+    return this.linearToLatex(str);
+  }
+
+  static buildFractionLatex(numeratorExpr, denominatorExpr) {
+    const numLatex = this.linearToLatex(this.stripOuterParens(numeratorExpr));
+    const denLatex = this.linearToLatexDenominator(
+      this.stripOuterParens(denominatorExpr),
+    );
+    return `\\frac{${numLatex}}{${denLatex}}`;
+  }
+
   static findTopLevelOperator(str, operators) {
     let depth = 0;
 
@@ -337,7 +357,7 @@ export default class MathAdapter {
       if (ch === ")") depth++;
       else if (ch === "(") depth--;
       else if (depth === 0 && operators.includes(ch)) {
-        // ignore unary minus
+        // علامت منفیِ ابتدای عبارت یا بعد از عملگر دیگر، به عنوان عملگر در نظر گرفته نشود
         if (ch === "-" && (i === 0 || "+-*/^=(".includes(str[i - 1]))) {
           continue;
         }
@@ -348,15 +368,22 @@ export default class MathAdapter {
     return -1;
   }
 
-  // src/ui/MathAdapter.js
+  // --- رشته خطی → لاتک ---
 
   static linearToLatex(expr) {
     if (expr == null) return "";
 
-    const str = String(expr).trim();
+    let str = String(expr).trim();
     if (!str) return "";
 
-    // ۱. معادله
+    // قدر مطلق: abs(...)
+    const absMatch = str.match(/^abs\(\s*(.+)\s*\)$/);
+    if (absMatch) {
+      const inner = absMatch[1];
+      return `\\left|${this.linearToLatex(inner)}\\right|`;
+    }
+
+    // تساوی
     const eqIndex = this.findTopLevelOperator(str, ["="]);
     if (eqIndex !== -1) {
       const left = str.slice(0, eqIndex);
@@ -364,7 +391,7 @@ export default class MathAdapter {
       return `${this.linearToLatex(left)} = ${this.linearToLatex(right)}`;
     }
 
-    // ۲. جمع و تفریق
+    // جمع و تفریق
     const addSubIndex = this.findTopLevelOperator(str, ["+", "-"]);
     if (addSubIndex !== -1) {
       const left = str.slice(0, addSubIndex);
@@ -373,7 +400,7 @@ export default class MathAdapter {
       return `${this.linearToLatex(left)} ${op} ${this.linearToLatex(right)}`;
     }
 
-    // ۳. ضرب و تقسیم
+    // ضرب و تقسیم
     const mulDivIndex = this.findTopLevelOperator(str, ["*", "/"]);
     if (mulDivIndex !== -1) {
       const left = str.slice(0, mulDivIndex);
@@ -381,13 +408,42 @@ export default class MathAdapter {
       const right = str.slice(mulDivIndex + 1);
 
       if (op === "/") {
-        return `\\frac{${this.linearToLatex(this.stripOuterParens(left))}}{${this.linearToLatex(this.stripOuterParens(right))}}`;
+        const leftTrimmed = left.trim();
+        const rightTrimmed = right.trim();
+
+        // اگر مخرج بدون پرانتز است، بررسی کنیم آیا عدد*متغیر است یا نه
+        if (!this.isFullyParenWrapped(rightTrimmed)) {
+          const coeffVarMatch = rightTrimmed.match(
+            /^(-?\d+(?:\.\d+)?)([A-Za-z][A-Za-z0-9_]*(?:\^[0-9]+)?)$/,
+          );
+
+          if (coeffVarMatch) {
+            // مثال: 3/(4x) → (3/4)*x
+            const [, numPart, varPart] = coeffVarMatch;
+            const fracLatex = this.buildFractionLatex(leftTrimmed, numPart);
+            const varLatex = this.linearToLatex(varPart);
+            return `${fracLatex}${varLatex}`;
+          }
+        }
+
+        return this.buildFractionLatex(leftTrimmed, rightTrimmed);
+      }
+
+      // ضرب
+      const leftTrimmed = left.trim();
+      const rightTrimmed = right.trim();
+      const isNumericLeft = /^-?\d+(\.\d+)?$/.test(leftTrimmed);
+      const isSqrtRight = this.isSqrtVirtualVariable(rightTrimmed);
+
+      // عدد در رادیکال: 2*sqrt(x)
+      if (isNumericLeft && isSqrtRight) {
+        return `${this.linearToLatex(leftTrimmed)}${this.linearToLatex(rightTrimmed)}`;
       }
 
       return `${this.linearToLatex(left)} \\cdot ${this.linearToLatex(right)}`;
     }
 
-    // ۴. توان
+    // توان
     const powIndex = this.findTopLevelOperator(str, ["^"]);
     if (powIndex !== -1) {
       const base = str.slice(0, powIndex).trim();
@@ -397,24 +453,24 @@ export default class MathAdapter {
       const cleanExponent = this.stripOuterParens(exponent);
       const expLatex = this.linearToLatex(cleanExponent);
 
+      // اگر پایه خودش یک کسر a/b است، توان را روی صورت و مخرج اعمال می‌کنیم
       const fracIndex = this.findTopLevelOperator(cleanBase, ["/"]);
       if (fracIndex !== -1) {
         const numerator = cleanBase.slice(0, fracIndex).trim();
         const denominator = cleanBase.slice(fracIndex + 1).trim();
 
-        return `\\frac{${this.linearToLatex(numerator)}^{${expLatex}}}{${this.linearToLatex(denominator)}^{${expLatex}}}`;
+        return `\\frac{${this.linearToLatex(numerator)}^{${expLatex}}}{${this.linearToLatexDenominator(denominator)}^{${expLatex}}}`;
       }
 
       return `${this.linearToLatex(cleanBase)}^{${expLatex}}`;
     }
 
-    // ۵. رادیکال (حالت کلی: حتی اگر بخشی از عبارت باشد)
-    // اینجا به جای چک کردن اینکه آیا «کل» عبارت رادیکال است، بررسی می‌کنیم که آیا با sqrt شروع می‌شود
+    // sqrt(...)
     if (this.isSqrtVirtualVariable(str)) {
       return this.sqrtVirtualVariableToLatex(str);
     }
 
-    // ۶. پرانتز کامل
+    // پرانتز بیرونی
     if (str.startsWith("(") && str.endsWith(")")) {
       const inner = this.stripOuterParens(str);
       if (inner !== str) {
@@ -422,17 +478,27 @@ export default class MathAdapter {
       }
     }
 
-    // ۷. عدد
+    // عدد خالص
     if (/^-?\d+(\.\d+)?$/.test(str)) {
       return str;
     }
 
-    // ۸. متغیر
+    // متغیر خالص
     if (/^[A-Za-z][A-Za-z0-9_]*$/.test(str)) {
       return this.colorizeVariable(str);
     }
 
-    // ۹. حالت ضرب ضمنی (مثل 3x)
+    // ضرب کسریِ ضمنی: (a/b)x
+    const implicitFracMulMatch = str.match(
+      /^\(([^)]+)\)([A-Za-z][A-Za-z0-9_]*)$/,
+    );
+    if (implicitFracMulMatch) {
+      const [, frac, variable] = implicitFracMulMatch;
+      const fracLatex = this.linearToLatex(frac);
+      return `${fracLatex}${this.colorizeVariable(variable)}`;
+    }
+
+    // ضرب ضمنی عدد در متغیر: 3x
     const implicitMulMatch = str.match(
       /^(-?\d+(?:\.\d+)?)([A-Za-z][A-Za-z0-9_]*)$/,
     );
@@ -441,15 +507,14 @@ export default class MathAdapter {
       return `${coeff}${this.colorizeVariable(variable)}`;
     }
 
-    // ۱۰. جایگزین (Fallback): اصلاح نهایی برای پیدا کردن sqrt در عبارات مرکب
-    // در این مرحله، هر رشته‌ای که با sqrt شروع شود را به لاتک تبدیل می‌کنیم
+    // رادیکال داخل رشته
     if (str.includes("sqrt(")) {
-      // این بخش کمک می‌کند تا `6sqrt(2)` به شکل درست پردازش شود
       return str.replace(/sqrt\([^)]+\)/g, (match) =>
         this.sqrtVirtualVariableToLatex(match),
       );
     }
 
+    // حالت عمومی: متغیرها رنگ می‌گیرند، * تبدیل به \\cdot می‌شود
     return str
       .replace(/([A-Za-z][A-Za-z0-9_]*)/g, (_, v) => this.colorizeVariable(v))
       .replace(/\*/g, " \\cdot ");

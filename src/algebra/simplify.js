@@ -109,12 +109,12 @@ function getPolynomialText(expr) {
   try {
     const polynomial = parsePolynomial(expr);
 
-    if (typeof polynomial.toString === "function") {
-      return polynomial.toString();
-    }
-
     if (typeof polynomial.toDisplayString === "function") {
       return polynomial.toDisplayString();
+    }
+
+    if (typeof polynomial.toString === "function") {
+      return polynomial.toString();
     }
 
     return String(polynomial);
@@ -292,11 +292,13 @@ function findLargestSquareFactor(radicand) {
  * sqrt(32)    -> 4*sqrt(2)
  * sqrt(9*x)   -> 3*sqrt(x)
  * sqrt(72*x)  -> 6*sqrt(2*x)
+ * sqrt(x^2)   -> abs(x)
  */
 function simplifyOneRadical(expr) {
   const text = String(expr);
-  const variableSquarePattern = /sqrt\(\s*([a-zA-Z][a-zA-Z0-9]*)\s*\^\s*2\s*\)/;
 
+  // ۱) حالت ویژه: sqrt(x^2) -> abs(x)
+  const variableSquarePattern = /sqrt\(\s*([a-zA-Z][a-zA-Z0-9]*)\s*\^\s*2\s*\)/;
   const variableSquareMatch = variableSquarePattern.exec(text);
 
   if (variableSquareMatch) {
@@ -305,6 +307,7 @@ function simplifyOneRadical(expr) {
     const simplifiedRadical = `abs(${variablePart})`;
 
     return {
+      kind: "variable-square",
       original: variableSquareMatch[0],
       separated: text.replace(variableSquareMatch[0], separatedRadical),
       simplified: text.replace(variableSquareMatch[0], simplifiedRadical),
@@ -312,6 +315,7 @@ function simplifyOneRadical(expr) {
     };
   }
 
+  // ۲) sqrt(عدد * متغیر)
   const coefficientVariablePattern =
     /sqrt\(\s*([0-9]+)\s*\*?\s*([a-zA-Z][a-zA-Z0-9]*(?:\^[0-9]+)?)\s*\)/;
 
@@ -334,6 +338,7 @@ function simplifyOneRadical(expr) {
     const simplifiedRadical = `${root}*sqrt(${remainingInside})`;
 
     return {
+      kind: "numeric-coefficient",
       original: coefficientVariableMatch[0],
       separated: text.replace(coefficientVariableMatch[0], separatedRadical),
       simplified: text.replace(coefficientVariableMatch[0], simplifiedRadical),
@@ -341,6 +346,7 @@ function simplifyOneRadical(expr) {
     };
   }
 
+  // ۳) sqrt(عدد)
   const numericPattern = /sqrt\(\s*([0-9]+)\s*\)/;
   const numericMatch = numericPattern.exec(text);
 
@@ -356,11 +362,27 @@ function simplifyOneRadical(expr) {
   }
 
   const { root, square, remainder } = factor;
+
+  // مربع کامل خالص: sqrt(9) -> 3
+  if (remainder === 1) {
+    const separatedRadical = numericMatch[0]; // همان شکل اولیه
+    const simplifiedRadical = String(root);
+
+    return {
+      kind: "pure-perfect-square",
+      original: numericMatch[0],
+      separated: text.replace(numericMatch[0], separatedRadical),
+      simplified: text.replace(numericMatch[0], simplifiedRadical),
+      square,
+    };
+  }
+
+  // سایر اعداد: sqrt(32) -> 4*sqrt(2)
   const separatedRadical = `sqrt(${square}*${remainder})`;
-  const simplifiedRadical =
-    remainder === 1 ? String(root) : `${root}*sqrt(${remainder})`;
+  const simplifiedRadical = `${root}*sqrt(${remainder})`;
 
   return {
+    kind: "pure-numeric",
     original: numericMatch[0],
     separated: text.replace(numericMatch[0], separatedRadical),
     simplified: text.replace(numericMatch[0], simplifiedRadical),
@@ -368,7 +390,37 @@ function simplifyOneRadical(expr) {
   };
 }
 
+/**
+ * تشخیص وجود تابع های ویژه مثل sqrt(...) یا abs(...)
+ * این تابع فقط برای محافظت از Parser استفاده می شود.
+ */
+function containsSpecialMathFunction(expr) {
+  const text = String(expr || "");
+  return /\b(?:sqrt|abs)\s*\(/.test(text);
+}
+// نمایش ویژه برای «جواب نهایی»:
+// اگر رشته به صورت (a/b)*x باشد، آن را به a/bx تبدیل می کند.
+// مثال: "(3/19)*x" -> "3/19x"
+function formatFinalAnswer(linear) {
+  const str = String(linear).trim();
+
+  // الگوی "(صورت/مخرج)*متغیر"
+  const fracTimesVariable = str.match(
+    /^\(([^()]+)\)\*([A-Za-z][A-Za-z0-9_]*)$/,
+  );
+
+  if (fracTimesVariable) {
+    const [, fraction, variable] = fracTimesVariable;
+    // fraction مثل "3/19" است، variable مثل "x"
+    return `${fraction}${variable}`; // "3/19x"
+  }
+
+  // در سایر حالت ها، همان رشته را بدون تغییر برگردان
+  return str;
+}
+
 export function simplify(expr, steps = []) {
+  // گام ۱: ثبت عبارت اولیه
   addInfoStep(steps, {
     title: "عبارت اولیه",
     description: "عبارت ورودی ثبت شده و برای بررسی و ساده سازی آماده می شود.",
@@ -379,6 +431,7 @@ export function simplify(expr, steps = []) {
     },
   });
 
+  // گام ۲: یکدست کردن نوشتار رادیکال ها و عملگرها
   const normalizedExpr = normalizeRadicalExpression(expr);
 
   if (normalizedExpr !== expr) {
@@ -396,6 +449,7 @@ export function simplify(expr, steps = []) {
 
   let currentExpr = normalizedExpr;
 
+  // گام ۳: تشخیص گشودن پرانتز
   const identities = detectIdentities(currentExpr) || [];
   const primaryIdentity = identities[0] || null;
 
@@ -444,6 +498,7 @@ export function simplify(expr, steps = []) {
     }
   }
 
+  // گام ۴: ترکیب رادیکال های عددی در ضرب و تقسیم
   const radicalRewrite = rewriteNumericSqrtMulDiv(currentExpr);
 
   if (radicalRewrite.changed && radicalRewrite.rewritten !== currentExpr) {
@@ -461,30 +516,70 @@ export function simplify(expr, steps = []) {
     currentExpr = radicalRewrite.rewritten;
   }
 
+  // گام ۵: ساده کردن رادیکال ها (یک رادیکال در هر بار)
   let radicalStep = simplifyOneRadical(currentExpr);
 
   while (radicalStep) {
-    addTransformStep(steps, {
-      title: "جدا کردن مربع کامل از زیر رادیکال",
-      description:
-        "بزرگ ترین مربع کامل از بخش عددی زیر رادیکال جدا می شود تا رادیکال ساده تر شود.",
-      from: currentExpr,
-      to: radicalStep.separated,
-      meta: {
-        phase: "separate-perfect-square",
-        originalRadical: radicalStep.original,
-        square: radicalStep.square,
-      },
-    });
+    let separateTitle = "جدا کردن مربع کامل از زیر رادیکال";
+    let separateDescription =
+      "بزرگ ترین مربع کامل از بخش عددی یا توان دوم زیر رادیکال جدا می شود تا رادیکال ساده تر شود.";
 
+    let simplifyTitle = "ساده کردن رادیکال";
+    let simplifyDescription =
+      "ریشه دوم مربع کامل محاسبه می شود و بخش باقی مانده زیر رادیکال می ماند.";
+
+    if (radicalStep.kind === "variable-square") {
+      separateTitle = "تشخیص توان دوم زیر رادیکال";
+      separateDescription =
+        "توان دوم متغیر زیر رادیکال مشخص می شود تا بتوان آن را به شکل مناسب ساده کرد.";
+
+      simplifyTitle = "ساده کردن رادیکال توان دوم";
+      simplifyDescription =
+        "ریشه دوم توان دوم متغیر زیر رادیکال محاسبه و به صورت قدر مطلق نوشته می شود.";
+    } else if (radicalStep.kind === "numeric-coefficient") {
+      separateDescription =
+        "بزرگ ترین مربع کامل از بخش عددی در ضرب با متغیر زیر رادیکال جدا می شود تا رادیکال ساده تر شود.";
+    } else if (radicalStep.kind === "pure-numeric") {
+      separateDescription =
+        "بزرگ ترین مربع کامل از عدد زیر رادیکال جدا می شود تا رادیکال ساده تر شود.";
+    } else if (radicalStep.kind === "pure-perfect-square") {
+      separateTitle = "تشخیص مربع کامل زیر رادیکال";
+      separateDescription =
+        "عدد زیر رادیکال بررسی می شود تا مشخص شود مربع کامل است و ریشه دوم آن یک عدد صحیح است.";
+
+      simplifyTitle = "ساده کردن رادیکال مربع کامل";
+      simplifyDescription =
+        "چون عدد زیر رادیکال مربع کامل است، ریشه دوم آن محاسبه و به صورت عدد صحیح نوشته می شود.";
+    }
+
+    // برای همه انواع به جز مربع کامل خالص، کارت «جدا کردن مربع کامل» اضافه می شود
+    if (radicalStep.kind !== "pure-perfect-square") {
+      addTransformStep(steps, {
+        title: separateTitle,
+        description: separateDescription,
+        from: currentExpr,
+        to: radicalStep.separated,
+        meta: {
+          phase: "separate-perfect-square",
+          kind: radicalStep.kind,
+          originalRadical: radicalStep.original,
+          square: radicalStep.square,
+        },
+      });
+    }
+
+    // کارت ساده کردن رادیکال (برای همه انواع، از جمله pure-perfect-square)
     addTransformStep(steps, {
-      title: "ساده کردن رادیکال",
-      description:
-        "ریشه دوم مربع کامل محاسبه می شود و بخش باقی مانده زیر رادیکال می ماند.",
-      from: radicalStep.separated,
+      title: simplifyTitle,
+      description: simplifyDescription,
+      from:
+        radicalStep.kind === "pure-perfect-square"
+          ? currentExpr
+          : radicalStep.separated,
       to: radicalStep.simplified,
       meta: {
         phase: "simplify-radical",
+        kind: radicalStep.kind,
         originalRadical: radicalStep.original,
       },
     });
@@ -493,32 +588,34 @@ export function simplify(expr, steps = []) {
     radicalStep = simplifyOneRadical(currentExpr);
   }
 
-  let result;
+  // گام ۶: ساده سازی عبارت با ترکیب جمله های متشابه
+  let result = currentExpr;
 
-  try {
-    const polynomial = parsePolynomial(currentExpr);
+  if (!containsSpecialMathFunction(currentExpr)) {
+    try {
+      const polynomial = parsePolynomial(currentExpr);
+      if (typeof polynomial.toDisplayString === "function") {
+        result = polynomial.toDisplayString();
+      } else if (typeof polynomial.toString === "function") {
+        result = polynomial.toString();
+      } else {
+        result = String(polynomial);
+      }
+    } catch (error) {
+      addInfoStep(steps, {
+        title: "خطا در ساده سازی",
+        description:
+          "در حین انجام محاسبات و ساده سازی عبارت خطایی رخ داد.\n" +
+          `جزئیات فنی: ${error.message}`,
+        value: currentExpr,
+        meta: {
+          error: error.message,
+          expr: currentExpr,
+        },
+      });
 
-    if (typeof polynomial.toString === "function") {
-      result = polynomial.toString();
-    } else if (typeof polynomial.toDisplayString === "function") {
-      result = polynomial.toDisplayString();
-    } else {
-      result = String(polynomial);
+      return expr;
     }
-  } catch (error) {
-    addInfoStep(steps, {
-      title: "خطا در ساده سازی",
-      description:
-        "در حین انجام محاسبات و ساده سازی عبارت خطایی رخ داد.\n" +
-        `جزئیات فنی: ${error.message}`,
-      value: currentExpr,
-      meta: {
-        error: error.message,
-        expr: currentExpr,
-      },
-    });
-
-    return expr;
   }
 
   const lastTransformTo =
@@ -529,7 +626,6 @@ export function simplify(expr, steps = []) {
           (step.kind === "transform" || step.type === "transform") &&
           typeof step.to === "string",
       )?.to || currentExpr;
-
   if (result !== lastTransformTo) {
     addTransformStep(steps, {
       title: "ساده سازی عبارت",
@@ -543,14 +639,17 @@ export function simplify(expr, steps = []) {
     });
   }
 
+  // فقط برای نمایش جواب نهایی، رشته را در صورت امکان ساده تر (بدون پرانتز و بدون علامت ضرب) می کنیم
+  const finalValue = formatFinalAnswer(result);
+
   addSolutionStep(steps, {
     description: "این عبارت، شکل نهایی و ساده شده پس از انجام همه محاسبات است.",
-    value: result,
+    value: finalValue,
     meta: {
       identitiesCount: identities.length,
       final: true,
     },
   });
 
-  return result;
+  return finalValue;
 }

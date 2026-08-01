@@ -1,3 +1,5 @@
+// src/algebra/parser.js
+
 import { Polynomial } from "./polynomial.js";
 import { Fraction } from "./fraction.js";
 
@@ -105,7 +107,7 @@ export class Parser {
         } else {
           if (!right.isConstant()) {
             throw new Error(
-              "تقسیم بر عبارتی که شامل متغیر است پشتیبانی نمی‌شود.",
+              "تقسیم بر عبارتی که شامل متغیر است پشتیبانی نمی شود.",
             );
           }
           node = node.divideByConstant(right.constantValue());
@@ -137,12 +139,12 @@ export class Parser {
         const right = this.factor();
 
         if (!right.isConstant()) {
-          throw new Error("توان فقط می‌تواند یک عدد ثابت باشد.");
+          throw new Error("توان فقط می تواند یک عدد ثابت باشد.");
         }
 
         const expVal = right.constantValue();
         if (expVal.den !== 1) {
-          throw new Error("توان‌های کسری پشتیبانی نمی‌شوند.");
+          throw new Error("توان های کسری پشتیبانی نمی شوند.");
         }
 
         node = node.pow(expVal.num);
@@ -159,7 +161,7 @@ export class Parser {
       throw new Error("پایان غیرمنتظره عبارت.");
     }
 
-    // بخشی از Parser.factor() در فایل parser.js شما
+    // تابع sqrt
     if (token.type === "FN" && token.value === "sqrt") {
       this.consume("sqrt");
       this.consume("(");
@@ -168,20 +170,19 @@ export class Parser {
 
       if (innerNode.isConstant()) {
         const val = innerNode.constantValue();
-        // فراخوانی تابع ساده‌سازی رادیکال (مانند خروج مربع‌های کامل)
         const { coeff, inside } = evaluateNumericSqrt(val);
 
         if (inside === 1) {
-          // اگر مربع کامل بود (مثل sqrt(9))، مستقیم عدد 3 برگردانده می‌شود
+          // مثال: sqrt(9) -> 3
           return Polynomial.fromNumber(coeff);
         }
 
-        // اگر مربع کامل نبود (مثل sqrt(8))، به صورت 2*sqrt(2) ذخیره می‌شود
+        // مثال: sqrt(8) -> 2*sqrt(2) به صورت متغیر مجازی
         const dummyVar = `sqrt(${inside})`;
         return new Polynomial([{ coeff, vars: { [dummyVar]: 1 } }]);
       }
 
-      // برای رادیکال‌های شامل متغیر (مثل sqrt(x))
+      // رادیکال های دارای متغیر (مثل sqrt(x))
       const dummyVar = `sqrt(${innerNode.toString()})`;
       return Polynomial.fromVariable(dummyVar);
     }
