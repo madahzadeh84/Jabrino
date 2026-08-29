@@ -958,7 +958,42 @@ document.addEventListener("DOMContentLoaded", () => {
   // مقداردهی اولیه رندر فرمول‌های راهنما
   initHelpModalMath();
 
-  editor.onEnter(window.solve);
+  /* =========================================
+   ENTER BEHAVIOR FOR MAIN MATH INPUT
+========================================= */
+
+  editor.onEnter(() => {
+    /*
+     * حالت فعال Self Solve را از خود UI می‌خوانیم.
+     * بنابراین main.js لازم نیست state داخلی
+     * selfSolve.js را بشناسد.
+     */
+
+    const selfModeButton = document.querySelector('[data-jabrino-mode="self"]');
+
+    const isSelfSolveMode = selfModeButton?.classList.contains("is-active");
+
+    /* -----------------------------------------
+     حالت «خودم حل می‌کنم»
+  ----------------------------------------- */
+
+    if (isSelfSolveMode) {
+      /*
+       * به selfSolve.js اعلام می‌کنیم
+       * که Enter روی صورت سؤال زده شده است.
+       */
+
+      document.dispatchEvent(new CustomEvent("jabrino:self-solve-enter"));
+
+      return;
+    }
+
+    /* -----------------------------------------
+     حالت عادی «حل با جبرینو»
+  ----------------------------------------- */
+
+    window.solve();
+  });
 });
 
 document.addEventListener("pointerdown", (event) => {

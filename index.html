@@ -10,6 +10,8 @@
     <script src="https://unpkg.com/mathlive"></script>
 
     <link rel="stylesheet" href="./assets/styles/main.css" />
+    <link rel="stylesheet" href="./assets/styles/selfSolve.css" />
+    <link rel="stylesheet" href="./assets/styles/jabrinoPalette.css" />
 </head>
 
 <body>
@@ -34,6 +36,17 @@
         <h1>جبرینو</h1>
         <div class="subtitle">حل معادله و ساده‌سازی عبارت جبری</div>
 
+        <!-- انتخاب حالت کار با جبرینو -->
+        <div class="jabrino-mode-switch" role="tablist" aria-label="انتخاب روش حل">
+            <button class="jabrino-mode-btn is-active" type="button" role="tab" aria-selected="true"
+                data-jabrino-mode="jabrino">
+                حل با جبرینو
+            </button>
+            <button class="jabrino-mode-btn" type="button" role="tab" aria-selected="false" data-jabrino-mode="self">
+                خودم حل می‌کنم
+            </button>
+        </div>
+
         <!-- فیلد ورودی ریاضی MathLive -->
         <div class="mini-kbd" id="miniKbd">
             <button type="button" data-action="frac">کسر</button>
@@ -46,308 +59,351 @@
 
         <button class="solveBtn" onclick="solve()">محاسبه</button>
 
-
-
-            <div id="result"></div>
-            <button id="stepsBtn" onclick="toggleSteps()" style="display:none">
-                نمایش مراحل
-            </button>
-
-            <div id="steps" class="steps-container" style="display:none"></div>
-            <div id="error"></div>
-
-        </div>
-
-        <div class="iran-footer-bar">
-            <div class="green"></div>
-            <div class="white"></div>
-            <div class="red"></div>
-        </div>
-
-        <!-- مودال راهنما -->
-        <div id="helpModal" class="modal">
-            <div class="modal-content">
-                <button id="closeHelp" class="close-btn" type="button" aria-label="بستن راهنما">
-                    <span>✕</span>
-                </button>
-                <h2>راهنمای استفاده از جبرینو</h2>
-
-                <div class="help-section">
-                    <h3>جبرینو چیست؟</h3>
-                    <p>
-                        جبرینو برای <b>حل معادله</b> و <b>ساده‌سازی عبارت‌های جبری</b> طراحی شده است.
-                        اگر در ورودی از علامت <code>=</code> استفاده کنید، عبارت به صورت معادله بررسی می‌شود؛
-                        در غیر این صورت، برنامه عبارت را ساده می‌کند.
-                    </p>
-                </div>
-
-                <div class="help-section">
-                    <h3>نحوه نوشتن عبارت‌های ریاضی</h3>
-                    <p>
-                        در کادر ورودی می‌توانید عبارت را به صورت مستقیم و با شکل استاندارد ریاضی وارد کنید.
-                    </p>
-                    <p>
-                        <b>کسر:</b>
-                        برای نوشتن کسر از <code>/</code> استفاده کنید تا صورت و مخرج ساخته شود.
-                    </p>
-                    <p>
-                        <b>توان:</b>
-                        برای نوشتن توان از <code>^</code> استفاده کنید، مانند <code>x^2</code>.
-                    </p>
-                    <p>
-                        <b>پرانتز:</b>
-                        برای مشخص شدن ترتیب محاسبه، از پرانتز استفاده کنید، مانند <code>2(x+3)</code>.
-                    </p>
-                    <p>
-                        <b>ضرب:</b>
-                        ضرب را می‌توان به صورت کنار هم نیز نوشت، مانند <code>2x</code> یا <code>3(x-2)</code>.
-                    </p>
-                </div>
-
-                <div class="help-section">
-                    <h3>ویژگی‌های ورودی</h3>
-                    <p>
-                        این ورودی از نوشتن عدد، متغیر، کسر، توان، پرانتز و عبارت‌های چندبخشی پشتیبانی می‌کند.
-                    </p>
-                    <p>
-                        با دکمه‌های بالای کادر نیز می‌توانید نوشتن <b>کسر</b>، <b>توان</b>، <b>رادیکال</b> و
-                        <b>پرانتز</b> را سریع‌تر انجام دهید.
-                    </p>
-                    <p>
-                        عبارت‌ها به صورت نوشتار ریاضی نمایش داده می‌شوند تا شکل ورودی با فرم معمول کتاب درسی
-                        هماهنگ باشد.
-                    </p>
-                </div>
-
-                <div class="help-section">
-                    <h3>مثال‌های معتبر</h3>
-                    <div class="example-box">3x - \frac{1}{2} = \frac{5}{4}</div>
-                    <div class="example-box">\frac{x+4}{3} = 5</div>
-                    <div class="example-box">2(x + 3)^2</div>
-                    <div class="example-box">(x+2)(x-2)</div>
-                </div>
-
-                <div class="help-section">
-                    <h3>ورودی‌های نامعتبر</h3>
-                    <p>
-                        اگر عبارت به شکل ناقص یا نادرست نوشته شود، ممکن است برنامه نتواند آن را بررسی کند.
-                    </p>
-                    <p>
-                        چند نمونه از ورودی‌های نامعتبر:
-                    </p>
-                    <ul style="padding-right: 20px; list-style-position: outside;">
-                        <li>پرانتز ناقص، مانند <code>(x+2</code></li>
-                        <li>کسر ناقص، مانند <code>3/</code></li>
-                        <li>توان ناقص، مانند <code>x^</code></li>
-                        <li>استفاده نادرست از چند علامت پشت سر هم</li>
-                        <li>نوشتن معادله با بیش از یک علامت <code>=</code></li>
-                    </ul>
-                    <p>
-                        در صورت بروز خطا، ابتدا کامل بودن پرانتزها، کسرها و توان‌ها را بررسی کنید.
-                    </p>
-                </div>
-
-                <div class="help-section">
-                    <h3>محدودیت‌ها</h3>
-                    <p>
-                        این نسخه برای بسیاری از تمرین‌های متداول مدرسه مناسب است، اما همهٔ حالت‌های جبری را
-                        پوشش نمی‌دهد.
-                    </p>
-                    <p>
-                        <b>مخرج کسرها بهتر است عددی باشد.</b>
-                        عبارت‌هایی مانند <code>1/x</code> یا حالت‌هایی که متغیر در مخرج قرار می‌گیرد،
-                        ممکن است در برخی مسائل پشتیبانی نشوند.
-                    </p>
-                    <p>
-                        برخی عبارت‌های پیچیده‌تر، به‌ویژه ترکیب چند کسر جبری، توان‌های غیرمعمول، یا فرم‌های
-                        غیرساده، ممکن است به طور کامل حل نشوند یا نیاز به نوشتن ساده‌تر داشته باشند.
-                    </p>
-                    <p>
-                        اگر نتیجه‌ای نمایش داده نشد یا پیام خطا ظاهر شد، عبارت را با پرانتزگذاری دقیق‌تر و
-                        شکل ساده‌تر دوباره وارد کنید.
-                    </p>
-                </div>
-
-            </div>
-        </div>
-
-        <!-- مودال تاریخچه محاسبات -->
-        <div id="historyModal" class="modal">
-            <div class="modal-content">
-                <button id="closeHistory" class="close-btn" type="button" aria-label="بستن تاریخچه">
-                    <span>✕</span>
-                </button>
-
-                <div class="history-header"
-                    style="display: flex; justify-content: space-between; align-items: center; padding: 10px;">
-                    <h3>تاریخچه محاسبات</h3>
-                    <button id="clearHistoryBtn"
-                        style="padding: 5px 10px; cursor: pointer; background-color: #ff6060; color: white; border: none; border-radius: 4px; font-size: 12px;">
-                        پاک‌سازی همه
-                    </button>
-                </div>
-                <div id="historyContainer"></div>
-            </div>
-        </div>
-
-        <!-- مودال درباره ما -->
-        <div id="aboutModal" class="modal" style="display: none;">
-            <div class="modal-content">
-                <button id="closeAbout" class="close-btn" type="button" aria-label="بستن درباره ما">
-                    <span>✕</span>
-                </button>
-
-                <h2>درباره ما</h2>
-
-                <div class="help-section">
-                    <h3>درباره ما</h3>
-                    <p>
-                        سیده نگار مداح‌زاده دانش‌آموز پایهٔ هشتم و علاقه‌مند به
-                        <b>ریاضی، برنامه‌نویسی، منطق، حل مسئله، طراحی ابزارهای آموزشی</b>
-                        و یادگیری فناوری‌های نو است. او در حال یادگیری و تجربه‌کردن
-                        فناوری‌های توسعهٔ وب مانند
-                        <b>HTML، CSS، JavaScript (جاوااسکریپت)، TypeScript (تایپ‌اسکریپت) و React (ری‌اکت)</b>
-                        است و تلاش می‌کند از برنامه‌نویسی به‌عنوان ابزاری برای ساختن
-                        تجربه‌های آموزشی مفید و قابل‌فهم استفاده کند.
-                    </p>
-                </div>
-
-                <div class="help-section">
-                    <h3>مسیر شکل‌گیری جبرینو</h3>
-                    <p>
-                        ایدهٔ جبرینو از علاقهٔ او به ریاضی و همچنین توجهش به دشواری‌های
-                        یادگیری بعضی از مباحث برای دانش‌آموزان شکل گرفت. از نگاه او،
-                        یکی از چالش‌های مهم در یادگیری ریاضی این است که بسیاری از
-                        دانش‌آموزان فقط با پاسخ نهایی روبه‌رو می‌شوند، در حالی که
-                        فهمیدن مسیر حل، بخش اصلی یادگیری است.
-                    </p>
-                    <p>
-                        جبرینو با همین نگاه شکل گرفته است؛ ابزاری که تلاش می‌کند
-                        روند حل را روشن‌تر، مرحله‌به‌مرحله و آموزشی‌تر نشان دهد تا
-                        دانش‌آموز بتواند بهتر فکر کند، بهتر تمرین کند و با اطمینان
-                        بیشتری یاد بگیرد.
-                    </p>
-                </div>
-
-                <div class="help-section">
-                    <h3>نگاه آموزشی و مخاطبان</h3>
-                    <p>
-                        سیده نگار مداح‌زاده جبرینو را فقط یک پروژهٔ فنی نمی‌بیند، بلکه آن را
-                        قدمی در مسیر ساخت ابزارهایی می‌داند که یادگیری را ساده‌تر،
-                        جذاب‌تر و عمیق‌تر می‌کنند. هدف او این است که دانش‌آموزان
-                        <b>متوسطهٔ اول و متوسطهٔ دوم</b> هنگام کار با جبرینو، ریاضی را
-                        صرفاً مجموعه‌ای از پاسخ‌ها نبینند، بلکه با منطق حل، نظم فکری و
-                        شیوهٔ رسیدن به نتیجه نیز آشنا شوند.
-                    </p>
-                </div>
-
-                <div class="help-section">
-                    <h3>پروژه‌ها و تجربه‌های دیگر</h3>
-                    <p>
-                        در کنار جبرینو، او پروژه‌های ساده و آموزشی دیگری نیز تجربه کرده
-                        است؛ از جمله یک وب‌سایت آب‌وهوا با استفاده از <b>API</b>، یک
-                        <b>Task Manager (مدیریت کارها)</b> ساده، فلش‌کارت آموزشی فیزیک
-                        و یک بازی پرسش‌وپاسخ برای سوالات عربی پایهٔ هشتم. این تجربه‌ها
-                        نشان می‌دهند که علاقهٔ اصلی او تنها یادگیری کدنویسی نیست، بلکه
-                        استفاده از فناوری برای طراحی ابزارهای کاربردی و آموزشی است.
-                    </p>
-                </div>
-
-                <div class="help-section">
-                    <h3>چشم‌انداز آینده جبرینو</h3>
-                    <p>
-                        چشم‌انداز او برای جبرینو نیز فراتر از وضعیت فعلی آن است.
-                        از جمله ایده‌هایی که برای توسعهٔ این پروژه در نظر دارد می‌توان
-                        به <b>تولید هوشمند معادله و عبارت جبری</b>، بخش
-                        <b>«خودت حل کن»</b> برای وارد کردن پاسخ توسط دانش‌آموز و
-                        دریافت بازخورد اصلاحی، <b>نمایش پویاتر مراحل حل</b>،
-                        <b>ثبت و بررسی روند پیشرفت کاربر</b>، <b>جزوات آموزشی</b>,
-                        <b>زندگی‌نامهٔ ریاضی‌دانان</b> و حرکت به سمت یک
-                        <b>معلم‌یار آموزشی هوشمند</b> اشاره کرد.
-                    </p>
-                    <p>
-                        هدف نهایی او این است که جبرینو به محیطی تبدیل شود که هم به حل
-                        مسئله کمک کند و هم در مسیر یادگیری، همراه دانش‌آموز باشد.
-                    </p>
-                </div>
-                <div class="help-section appreciation-section">
-                    <h3 class="section-title">تشکر و قدردانی</h3>
-
-                    <p class="section-text">
-                        ما این سامانه را با هدف فراهم‌کردن محیطی آموزشی، ساده و قابل‌فهم برای یادگیری بهتر ریاضی طراحی
-                        کرده‌ایم.
-                    </p>
-
-                    <p class="section-text">
-                        در این مسیر، از همراهی و تلاش ارزشمند دبیران گرامی و داوران محترم صمیمانه سپاسگزاریم.
-                        همراهی و بازخوردهای سازندهٔ ایشان نقش مهمی در بهبود و تکمیل این مجموعه داشته است.
-                    </p>
-
-                    <div class="appreciation-box">
-                        <p class="appreciation-intro">با سپاس ویژه از:</p>
-
-                        <div class="person-item">
-                            <span class="person-name">سرکار خانم نجمی</span>
-                            <span class="person-role">دبیر راهنما</span>
-                        </div>
-
-                        <div class="person-item">
-                            <span class="person-name">سرکار خانم شریف‌پور</span>
-                            <span class="person-role">
-                                سرگروه ریاضی شهریار و ناظر جشنواره نوجوان خوارزمی شهریار
-                            </span>
-                        </div>
-
-                        <div class="person-item">
-                            <span class="person-name">سایر داوران محترم منطقه و استان</span>
-                        </div>
-                    </div>
-                </div>
-
-
-            </div>
-        </div>
-        <!-- مودال ریاضی دانان -->
-        <div id="mathematiciansModal" class="modal mathematicians-modal">
-            <div class="modal-content mathematicians-modal-content">
-                <button id="closeMathematicians" class="close-btn" type="button" aria-label="بستن بخش ریاضی دانان">
-                    <span>✕</span>
-                </button>
-
-                <h2>ریاضی دانان</h2>
-
-                <p class="mathematicians-intro">
-                    نام یک ریاضی دان را جستجو کنید تا اطلاعات او از ویکی پدیای فارسی نمایش داده شود.
+        <!-- حالت «خودم حل می‌کنم» -->
+        <section id="selfSolvePanel" class="self-solve-panel" hidden>
+            <div class="self-solve-intro">
+                <p id="selfProblemStatus">
+                    صورت سؤال را در کادر بالا وارد کن و سپس «شروع حل» را بزن.
                 </p>
 
-                <div class="mathematician-search-bar">
-                    <input id="mathematicianSearchInput" type="search"
-                        placeholder="برای نمونه: خوارزمی، مریم میرزاخانی یا اقلیدس" autocomplete="off">
-                    <button id="mathematicianSearchBtn" type="button">
-                        جستجو
+                <div class="self-solve-actions">
+                    <button id="selfStartBtn" class="self-solve-primary-btn" type="button">
+                        شروع حل
+                    </button>
+                    <button id="selfNewProblemBtn" class="self-solve-link-btn" type="button">
+                        سؤال جدید
+                    </button>
+                </div>
+            </div>
+
+            <div id="selfAnswerArea" class="self-answer-area" hidden>
+                <div class="self-answer-header">
+                    <h3>پاسخ من</h3>
+                    <span class="self-answer-hint">پاسخ نهایی را وارد کن.</span>
+                </div>
+
+                <div class="mini-kbd" id="selfAnswerMiniKbd">
+                    <button type="button" data-action="frac">کسر</button>
+                    <button type="button" data-action="power">توان</button>
+                    <button type="button" data-action="sqrt">رادیکال</button>
+                    <button type="button" data-action="paren">پرانتز</button>
+                </div>
+
+                <math-field id="selfAnswerInput" dir="ltr"></math-field>
+
+                <div class="self-solve-actions">
+                    <button id="selfCheckBtn" class="self-solve-primary-btn" type="button">
+                        بررسی پاسخ
+                    </button>
+                    <button id="selfRetryBtn" class="self-solve-secondary-btn" type="button" hidden>
+                        دوباره تلاش می‌کنم
+                    </button>
+                    <button id="selfShowSolutionBtn" class="self-solve-secondary-btn" type="button" hidden>
+                        مشاهده راه‌حل جبرینو
                     </button>
                 </div>
 
-                <div id="mathematicianStatus" class="mathematician-status" aria-live="polite"></div>
-
-                <div id="mathematicianList" class="mathematician-list"></div>
-
-                <section id="mathematicianDetail" class="mathematician-detail" hidden></section>
+                <div id="selfFeedback" class="self-solve-feedback" aria-live="polite" hidden></div>
+                <div id="selfSolution" class="self-solve-solution" hidden></div>
             </div>
-            <div id="mathematicianDetailModal" class="modal mathematician-detail-modal">
-                <div class="modal-content mathematician-detail-modal-content">
-                    <!-- کلاس دکمه به mathematician-detail-close-btn تغییر کرد -->
-                    <button id="closeMathematicianDetail" class="mathematician-detail-close-btn" type="button"
-                        aria-label="بستن">
-                        &times;
-                    </button>
+        </section>
 
-                    <div id="mathematicianDetailContent"></div>
+        <div id="result"></div>
+        <button id="stepsBtn" onclick="toggleSteps()" style="display:none">
+            نمایش مراحل
+        </button>
+
+
+        <div id="steps" class="steps-container" style="display:none"></div>
+        <div id="error"></div>
+
+    </div>
+
+    <!-- مودال راهنما -->
+    <div id="helpModal" class="modal">
+        <div class="modal-content">
+            <button id="closeHelp" class="close-btn" type="button" aria-label="بستن راهنما">
+                <span>✕</span>
+            </button>
+            <h2>راهنمای استفاده از جبرینو</h2>
+
+            <div class="help-section">
+                <h3>جبرینو چیست؟</h3>
+                <p>
+                    جبرینو برای <b>حل معادله</b> و <b>ساده‌سازی عبارت‌های جبری</b> طراحی شده است.
+                    اگر در ورودی از علامت <code>=</code> استفاده کنید، عبارت به صورت معادله بررسی می‌شود؛
+                    در غیر این صورت، برنامه عبارت را ساده می‌کند.
+                </p>
+            </div>
+
+            <div class="help-section">
+                <h3>نحوه نوشتن عبارت‌های ریاضی</h3>
+                <p>
+                    در کادر ورودی می‌توانید عبارت را به صورت مستقیم و با شکل استاندارد ریاضی وارد کنید.
+                </p>
+                <p>
+                    <b>کسر:</b>
+                    برای نوشتن کسر از <code>/</code> استفاده کنید تا صورت و مخرج ساخته شود.
+                </p>
+                <p>
+                    <b>توان:</b>
+                    برای نوشتن توان از <code>^</code> استفاده کنید، مانند <code>x^2</code>.
+                </p>
+                <p>
+                    <b>پرانتز:</b>
+                    برای مشخص شدن ترتیب محاسبه، از پرانتز استفاده کنید، مانند <code>2(x+3)</code>.
+                </p>
+                <p>
+                    <b>ضرب:</b>
+                    ضرب را می‌توان به صورت کنار هم نیز نوشت، مانند <code>2x</code> یا <code>3(x-2)</code>.
+                </p>
+            </div>
+
+            <div class="help-section">
+                <h3>ویژگی‌های ورودی</h3>
+                <p>
+                    این ورودی از نوشتن عدد، متغیر، کسر، توان، پرانتز و عبارت‌های چندبخشی پشتیبانی می‌کند.
+                </p>
+                <p>
+                    با دکمه‌های بالای کادر نیز می‌توانید نوشتن <b>کسر</b>، <b>توان</b>، <b>رادیکال</b> و
+                    <b>پرانتز</b> را سریع‌تر انجام دهید.
+                </p>
+                <p>
+                    عبارت‌ها به صورت نوشتار ریاضی نمایش داده می‌شوند تا شکل ورودی با فرم معمول کتاب درسی
+                    هماهنگ باشد.
+                </p>
+            </div>
+
+            <div class="help-section">
+                <h3>مثال‌های معتبر</h3>
+                <div class="example-box">3x - \frac{1}{2} = \frac{5}{4}</div>
+                <div class="example-box">\frac{x+4}{3} = 5</div>
+                <div class="example-box">2(x + 3)^2</div>
+                <div class="example-box">(x+2)(x-2)</div>
+            </div>
+
+            <div class="help-section">
+                <h3>ورودی‌های نامعتبر</h3>
+                <p>
+                    اگر عبارت به شکل ناقص یا نادرست نوشته شود، ممکن است برنامه نتواند آن را بررسی کند.
+                </p>
+                <p>
+                    چند نمونه از ورودی‌های نامعتبر:
+                </p>
+                <ul style="padding-right: 20px; list-style-position: outside;">
+                    <li>پرانتز ناقص، مانند <code>(x+2</code></li>
+                    <li>کسر ناقص، مانند <code>3/</code></li>
+                    <li>توان ناقص، مانند <code>x^</code></li>
+                    <li>استفاده نادرست از چند علامت پشت سر هم</li>
+                    <li>نوشتن معادله با بیش از یک علامت <code>=</code></li>
+                </ul>
+                <p>
+                    در صورت بروز خطا، ابتدا کامل بودن پرانتزها، کسرها و توان‌ها را بررسی کنید.
+                </p>
+            </div>
+
+            <div class="help-section">
+                <h3>محدودیت‌ها</h3>
+                <p>
+                    این نسخه برای بسیاری از تمرین‌های متداول مدرسه مناسب است، اما همهٔ حالت‌های جبری را
+                    پوشش نمی‌دهد.
+                </p>
+                <p>
+                    <b>مخرج کسرها بهتر است عددی باشد.</b>
+                    عبارت‌هایی مانند <code>1/x</code> یا حالت‌هایی که متغیر در مخرج قرار می‌گیرد،
+                    ممکن است در برخی مسائل پشتیبانی نشوند.
+                </p>
+                <p>
+                    برخی عبارت‌های پیچیده‌تر، به‌ویژه ترکیب چند کسر جبری، توان‌های غیرمعمول، یا فرم‌های
+                    غیرساده، ممکن است به طور کامل حل نشوند یا نیاز به نوشتن ساده‌تر داشته باشند.
+                </p>
+                <p>
+                    اگر نتیجه‌ای نمایش داده نشد یا پیام خطا ظاهر شد، عبارت را با پرانتزگذاری دقیق‌تر و
+                    شکل ساده‌تر دوباره وارد کنید.
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- مودال تاریخچه محاسبات -->
+    <div id="historyModal" class="modal">
+        <div class="modal-content">
+            <button id="closeHistory" class="close-btn" type="button" aria-label="بستن تاریخچه">
+                <span>✕</span>
+            </button>
+
+            <div class="history-header"
+                style="display: flex; justify-content: space-between; align-items: center; padding: 10px;">
+                <h3>تاریخچه محاسبات</h3>
+                <button id="clearHistoryBtn"
+                    style="padding: 5px 10px; cursor: pointer; background-color: #ff6060; color: white; border: none; border-radius: 4px; font-size: 12px;">
+                    پاک‌سازی همه
+                </button>
+            </div>
+            <div id="historyContainer"></div>
+        </div>
+    </div>
+
+    <!-- مودال درباره ما -->
+    <div id="aboutModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <button id="closeAbout" class="close-btn" type="button" aria-label="بستن درباره ما">
+                <span>✕</span>
+            </button>
+
+            <h2>درباره ما</h2>
+
+            <div class="help-section">
+                <h3>درباره ما</h3>
+                <p>
+                    سیده نگار مداح‌زاده دانش‌آموز پایهٔ هشتم و علاقه‌مند به
+                    <b>ریاضی، برنامه‌نویسی، منطق، حل مسئله، طراحی ابزارهای آموزشی</b>
+                    و یادگیری فناوری‌های نو است. او در حال یادگیری و تجربه‌کردن
+                    فناوری‌های توسعهٔ وب مانند
+                    <b>HTML، CSS، JavaScript (جاوااسکریپت)، TypeScript (تایپ‌اسکریپت) و React (ری‌اکت)</b>
+                    است و تلاش می‌کند از برنامه‌نویسی به‌عنوان ابزاری برای ساختن
+                    تجربه‌های آموزشی مفید و قابل‌فهم استفاده کند.
+                </p>
+            </div>
+
+            <div class="help-section">
+                <h3>مسیر شکل‌گیری جبرینو</h3>
+                <p>
+                    ایدهٔ جبرینو از علاقهٔ او به ریاضی و همچنین توجهش به دشواری‌های
+                    یادگیری بعضی از مباحث برای دانش‌آموزان شکل گرفت. از نگاه او،
+                    یکی از چالش‌های مهم در یادگیری ریاضی این است که بسیاری از
+                    دانش‌آموزان فقط با پاسخ نهایی روبه‌رو می‌شوند، در حالی که
+                    فهمیدن مسیر حل، بخش اصلی یادگیری است.
+                </p>
+                <p>
+                    جبرینو با همین نگاه شکل گرفته است؛ ابزاری که تلاش می‌کند
+                    روند حل را روشن‌تر، مرحله‌به‌مرحله و آموزشی‌تر نشان دهد تا
+                    دانش‌آموز بتواند بهتر فکر کند، بهتر تمرین کند و با اطمینان
+                    بیشتری یاد بگیرد.
+                </p>
+            </div>
+
+            <div class="help-section">
+                <h3>نگاه آموزشی و مخاطبان</h3>
+                <p>
+                    سیده نگار مداح‌زاده جبرینو را فقط یک پروژهٔ فنی نمی‌بیند، بلکه آن را
+                    قدمی در مسیر ساخت ابزارهایی می‌داند که یادگیری را ساده‌تر،
+                    جذاب‌تر و عمیق‌تر می‌کنند. هدف او این است که دانش‌آموزان
+                    <b>متوسطهٔ اول و متوسطهٔ دوم</b> هنگام کار با جبرینو، ریاضی را
+                    صرفاً مجموعه‌ای از پاسخ‌ها نبینند، بلکه با منطق حل، نظم فکری و
+                    شیوهٔ رسیدن به نتیجه نیز آشنا شوند.
+                </p>
+            </div>
+
+            <div class="help-section">
+                <h3>پروژه‌ها و تجربه‌های دیگر</h3>
+                <p>
+                    در کنار جبرینو، او پروژه‌های ساده و آموزشی دیگری نیز تجربه کرده
+                    است؛ از جمله یک وب‌سایت آب‌وهوا با استفاده از <b>API</b>، یک
+                    <b>Task Manager (مدیریت کارها)</b> ساده، فلش‌کارت آموزشی فیزیک
+                    و یک بازی پرسش‌وپاسخ برای سوالات عربی پایهٔ هشتم. این تجربه‌ها
+                    نشان می‌دهند که علاقهٔ اصلی او تنها یادگیری کدنویسی نیست، بلکه
+                    استفاده از فناوری برای طراحی ابزارهای کاربردی و آموزشی است.
+                </p>
+            </div>
+
+            <div class="help-section">
+                <h3>چشم‌انداز آینده جبرینو</h3>
+                <p>
+                    چشم‌انداز او برای جبرینو نیز فراتر از وضعیت فعلی آن است.
+                    از جمله ایده‌هایی که برای توسعهٔ این پروژه در نظر دارد می‌توان
+                    به <b>تولید هوشمند معادله و عبارت جبری</b>، بخش
+                    <b>«خودت حل کن»</b> برای وارد کردن پاسخ توسط دانش‌آموز و
+                    دریافت بازخورد اصلاحی، <b>نمایش پویاتر مراحل حل</b>،
+                    <b>ثبت و بررسی روند پیشرفت کاربر</b>، <b>جزوات آموزشی</b>,
+                    <b>زندگی‌نامهٔ ریاضی‌دانان</b> و حرکت به سمت یک
+                    <b>معلم‌یار آموزشی هوشمند</b> اشاره کرد.
+                </p>
+                <p>
+                    هدف نهایی او این است که جبرینو به محیطی تبدیل شود که هم به حل
+                    مسئله کمک کند و هم در مسیر یادگیری، همراه دانش‌آموز باشد.
+                </p>
+            </div>
+            <div class="help-section appreciation-section">
+                <h3 class="section-title">تشکر و قدردانی</h3>
+
+                <p class="section-text">
+                    ما این سامانه را با هدف فراهم‌کردن محیطی آموزشی، ساده و قابل‌فهم برای یادگیری بهتر ریاضی طراحی
+                    کرده‌ایم.
+                </p>
+
+                <p class="section-text">
+                    در این مسیر، از همراهی و تلاش ارزشمند دبیران گرامی و داوران محترم صمیمانه سپاسگزاریم.
+                    همراهی و بازخوردهای سازندهٔ ایشان نقش مهمی در بهبود و تکمیل این مجموعه داشته است.
+                </p>
+
+                <div class="appreciation-box">
+                    <p class="appreciation-intro">با سپاس ویژه از:</p>
+
+                    <div class="person-item">
+                        <span class="person-name">سرکار خانم نجمی</span>
+                        <span class="person-role">دبیر راهنما</span>
+                    </div>
+
+                    <div class="person-item">
+                        <span class="person-name">سرکار خانم شریف‌پور</span>
+                        <span class="person-role">
+                            سرگروه ریاضی شهریار و ناظر جشنواره نوجوان خوارزمی شهریار
+                        </span>
+                    </div>
+
+                    <div class="person-item">
+                        <span class="person-name">سایر داوران محترم منطقه و استان</span>
+                    </div>
                 </div>
             </div>
+
+
+        </div>
+    </div>
+    <!-- مودال ریاضی دانان -->
+    <div id="mathematiciansModal" class="modal mathematicians-modal">
+        <div class="modal-content mathematicians-modal-content">
+            <button id="closeMathematicians" class="close-btn" type="button" aria-label="بستن بخش ریاضی دانان">
+                <span>✕</span>
+            </button>
+
+            <h2>ریاضی دانان</h2>
+
+            <p class="mathematicians-intro">
+                نام یک ریاضی دان را جستجو کنید تا اطلاعات او از ویکی پدیای فارسی نمایش داده شود.
+            </p>
+
+            <div class="mathematician-search-bar">
+                <input id="mathematicianSearchInput" type="search"
+                    placeholder="برای نمونه: خوارزمی، مریم میرزاخانی یا اقلیدس" autocomplete="off">
+                <button id="mathematicianSearchBtn" type="button">
+                    جستجو
+                </button>
+            </div>
+
+            <div id="mathematicianStatus" class="mathematician-status" aria-live="polite"></div>
+
+            <div id="mathematicianList" class="mathematician-list"></div>
+
+            <section id="mathematicianDetail" class="mathematician-detail" hidden></section>
+        </div>
+        <div id="mathematicianDetailModal" class="modal mathematician-detail-modal">
+            <div class="modal-content mathematician-detail-modal-content">
+                <!-- کلاس دکمه به mathematician-detail-close-btn تغییر کرد -->
+                <button id="closeMathematicianDetail" class="mathematician-detail-close-btn" type="button"
+                    aria-label="بستن">
+                    &times;
+                </button>
+
+                <div id="mathematicianDetailContent"></div>
+            </div>
+        </div>
 
         <!-- بارگذاری به عنوان ماژول جاوااسکریپت -->
         <script type="module" src="./src/app/main.js"></script>
+        <script type="module" src="./src/app/selfSolve.js"></script>
 
 </body>
 

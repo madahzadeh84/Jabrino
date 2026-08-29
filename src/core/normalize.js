@@ -1,9 +1,19 @@
-//src/core/normalize.js
+// src/core/normalize.js
 
+/**
+ * یکسان‌سازی اولیه ورودی ریاضی
+ *
+ * وظایف این تابع:
+ * - تبدیل ورودی به رشته
+ * - حذف فاصله‌ها
+ * - تبدیل شکل‌های مختلف علامت ضرب به *
+ * - تبدیل علامت تقسیم به /
+ *
+ * این تابع عمداً وارد اعتبارسنجی یا حل عبارت نمی‌شود.
+ */
 export function normalize(expr) {
-  expr = expr.replace(/\s+/g, "");
-  expr = expr.replace(/×|&times;|⋅|∙/g, "*");
-  expr = expr.replace(/÷/g, "/");
-  return expr;
+  return String(expr ?? "")
+    .replace(/\s+/g, "")
+    .replace(/×|&times;|⋅|∙|·/g, "*")
+    .replace(/÷/g, "/");
 }
-

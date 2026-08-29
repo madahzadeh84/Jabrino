@@ -1,0 +1,909 @@
+/* =========================================================
+   JABRINO DESIGN SYSTEM
+   Academic · Modern · Friendly
+========================================================= */
+
+/* =========================================================
+   01. DESIGN TOKENS
+========================================================= */
+
+:root {
+  /* ---------- Brand ---------- */
+
+  --jb-primary: #163a5f;
+  --jb-primary-hover: #123250;
+  --jb-primary-dark: #102a43;
+
+  --jb-primary-soft: #edf3f7;
+  --jb-primary-soft-hover: #e4edf3;
+
+  /* ---------- Accent ---------- */
+
+  --jb-accent: #2f80a3;
+  --jb-accent-hover: #276f8e;
+  --jb-accent-dark: #225f79;
+
+  --jb-accent-soft: #eaf5f8;
+  --jb-accent-soft-2: #f3fafc;
+
+  /* ---------- Semantic ---------- */
+
+  --jb-success: #16856b;
+  --jb-success-dark: #106b57;
+  --jb-success-soft: #eaf8f3;
+  --jb-success-border: #b9e6d8;
+
+  --jb-warning: #c97927;
+  --jb-warning-dark: #9f5e1b;
+  --jb-warning-soft: #fff6e9;
+  --jb-warning-border: #f1d5ad;
+
+  --jb-danger: #c24b4b;
+  --jb-danger-dark: #9f3939;
+  --jb-danger-soft: #fff0f0;
+  --jb-danger-border: #efc3c3;
+
+  --jb-info: #327ea2;
+  --jb-info-dark: #285f7a;
+  --jb-info-soft: #edf7fb;
+  --jb-info-border: #bfdeea;
+
+  /* ---------- Text ---------- */
+
+  --jb-text: #1e293b;
+  --jb-text-strong: #142033;
+  --jb-text-secondary: #475569;
+  --jb-text-muted: #718096;
+  --jb-text-subtle: #94a3b8;
+
+  /* ---------- Surfaces ---------- */
+
+  --jb-bg: #f5f8fa;
+  --jb-bg-secondary: #eef3f6;
+
+  --jb-surface: #ffffff;
+  --jb-surface-soft: #f8fafb;
+  --jb-surface-muted: #f2f6f8;
+
+  /* ---------- Borders ---------- */
+
+  --jb-border: #dce5ea;
+  --jb-border-soft: #e7edf1;
+  --jb-border-strong: #c7d4dc;
+
+  /* ---------- Radius ---------- */
+
+  --jb-radius-xs: 7px;
+  --jb-radius-sm: 9px;
+  --jb-radius-md: 12px;
+  --jb-radius-lg: 16px;
+  --jb-radius-xl: 20px;
+  --jb-radius-2xl: 26px;
+  --jb-radius-pill: 999px;
+
+  /* ---------- Shadow ---------- */
+
+  --jb-shadow-xs: 0 2px 6px rgba(16, 42, 67, 0.035);
+
+  --jb-shadow-sm: 0 4px 12px rgba(16, 42, 67, 0.055);
+
+  --jb-shadow-md: 0 10px 28px rgba(16, 42, 67, 0.075);
+
+  --jb-shadow-lg: 0 20px 48px rgba(16, 42, 67, 0.11);
+
+  --jb-shadow-modal: 0 28px 70px rgba(16, 42, 67, 0.18);
+
+  /* ---------- Motion ---------- */
+
+  --jb-transition-fast: 0.16s ease;
+
+  --jb-transition: 0.22s ease;
+
+  --jb-transition-slow: 0.32s ease;
+
+  /* ---------- Layout ---------- */
+
+  --jb-content-width: 520px;
+}
+
+/* =========================================================
+   02. GLOBAL RESET / FOUNDATION
+========================================================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: light;
+}
+
+body {
+  color: var(--jb-text);
+
+  background:
+    radial-gradient(circle at 88% 4%, rgba(47, 128, 163, 0.1), transparent 27%),
+    radial-gradient(circle at 8% 92%, rgba(22, 58, 95, 0.055), transparent 31%),
+    linear-gradient(180deg, #f5f8fa 0%, #fbfcfd 54%, #ffffff 100%) !important;
+
+  background-attachment: fixed;
+
+  font-family: Vazirmatn, Tahoma, Arial, sans-serif;
+
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* =========================================================
+   03. MAIN APP SHELL
+========================================================= */
+
+.container {
+  position: relative;
+
+  border: 1px solid rgba(199, 212, 220, 0.92) !important;
+
+  border-top: 5px solid var(--jb-primary) !important;
+
+  border-bottom: 1px solid var(--jb-border) !important;
+
+  border-radius: var(--jb-radius-xl) !important;
+
+  background: rgba(255, 255, 255, 0.97) !important;
+
+  box-shadow: var(--jb-shadow-lg) !important;
+
+  overflow: visible;
+
+  backdrop-filter: blur(8px);
+}
+
+.container::before {
+  content: "";
+
+  position: absolute;
+
+  top: -5px;
+  right: 34%;
+
+  width: 32%;
+  height: 5px;
+
+  border-radius: 0 0 6px 6px;
+
+  background: var(--jb-accent);
+
+  pointer-events: none;
+}
+
+/* =========================================================
+   04. BRAND
+========================================================= */
+
+.container > h1 {
+  margin-top: 6px !important;
+
+  color: var(--jb-primary) !important;
+
+  font-weight: 900 !important;
+
+  letter-spacing: -0.025em;
+}
+
+.container > h1::after {
+  content: "";
+
+  display: block;
+
+  width: 42px;
+  height: 3px;
+
+  margin: 8px auto 0;
+
+  border-radius: var(--jb-radius-pill);
+
+  background: linear-gradient(90deg, var(--jb-primary), var(--jb-accent));
+}
+
+.subtitle {
+  color: var(--jb-text-muted) !important;
+
+  font-weight: 500;
+
+  letter-spacing: -0.01em;
+}
+
+/* =========================================================
+   05. COMMON BUTTON LANGUAGE
+========================================================= */
+
+button {
+  font-family: inherit;
+
+  transition:
+    background-color var(--jb-transition-fast),
+    border-color var(--jb-transition-fast),
+    color var(--jb-transition-fast),
+    box-shadow var(--jb-transition-fast),
+    transform var(--jb-transition-fast);
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+math-field:focus-visible {
+  outline: 3px solid rgba(47, 128, 163, 0.19);
+
+  outline-offset: 2px;
+}
+
+/* =========================================================
+   06. TOP / UTILITY BUTTONS
+========================================================= */
+
+.help-floating-btn,
+.history-floating-btn,
+.about-top-brand-btn,
+.mathematicians-floating-btn {
+  color: var(--jb-text-secondary) !important;
+
+  background: rgba(255, 255, 255, 0.92) !important;
+
+  border: 1px solid var(--jb-border) !important;
+
+  box-shadow: var(--jb-shadow-sm) !important;
+
+  backdrop-filter: blur(10px);
+}
+
+.help-floating-btn:hover,
+.history-floating-btn:hover,
+.about-top-brand-btn:hover,
+.mathematicians-floating-btn:hover {
+  color: var(--jb-primary) !important;
+
+  background: var(--jb-primary-soft) !important;
+
+  border-color: #b9cbd7 !important;
+
+  transform: translateY(-1px);
+}
+
+/* =========================================================
+   07. MATH MINI KEYBOARD
+========================================================= */
+
+.mini-kbd {
+  gap: 7px !important;
+}
+
+.mini-kbd button {
+  color: var(--jb-text-secondary) !important;
+
+  background: var(--jb-surface-soft) !important;
+
+  border: 1px solid var(--jb-border) !important;
+
+  border-radius: var(--jb-radius-sm) !important;
+
+  box-shadow: none !important;
+
+  font-weight: 700 !important;
+}
+
+.mini-kbd button:hover {
+  color: var(--jb-primary) !important;
+
+  background: var(--jb-primary-soft) !important;
+
+  border-color: #b8cad6 !important;
+
+  transform: translateY(-1px);
+}
+
+/* =========================================================
+   08. MAIN MATH INPUT
+========================================================= */
+
+#mathInput,
+#selfAnswerInput {
+  color: var(--jb-text-strong) !important;
+
+  background: var(--jb-surface) !important;
+
+  border: 1.5px solid var(--jb-border-strong) !important;
+
+  border-radius: var(--jb-radius-md) !important;
+
+  box-shadow:
+    inset 0 1px 2px rgba(16, 42, 67, 0.025),
+    0 3px 10px rgba(16, 42, 67, 0.035) !important;
+
+  transition:
+    border-color var(--jb-transition),
+    box-shadow var(--jb-transition),
+    background var(--jb-transition);
+}
+
+#mathInput:focus-within,
+#selfAnswerInput:focus-within {
+  border-color: var(--jb-accent) !important;
+
+  box-shadow:
+    0 0 0 4px rgba(47, 128, 163, 0.1),
+    0 6px 16px rgba(16, 42, 67, 0.055) !important;
+}
+
+/* =========================================================
+   09. PRIMARY SOLVE BUTTON
+========================================================= */
+
+.solveBtn {
+  color: #ffffff !important;
+
+  background: linear-gradient(135deg, var(--jb-primary), #1b4a73) !important;
+
+  border: 1px solid var(--jb-primary) !important;
+
+  border-radius: var(--jb-radius-md) !important;
+
+  box-shadow: 0 7px 18px rgba(22, 58, 95, 0.18) !important;
+
+  font-weight: 800 !important;
+}
+
+.solveBtn:hover {
+  background: linear-gradient(
+    135deg,
+    var(--jb-primary-hover),
+    var(--jb-primary)
+  ) !important;
+
+  box-shadow: 0 10px 22px rgba(22, 58, 95, 0.22) !important;
+
+  transform: translateY(-1px);
+}
+
+.solveBtn:active {
+  transform: translateY(0);
+}
+
+/* =========================================================
+   10. RESULT
+========================================================= */
+
+#result {
+  color: var(--jb-text) !important;
+}
+
+.result-box,
+.result-content,
+.final-result {
+  border-color: var(--jb-border) !important;
+
+  background: var(--jb-surface-soft) !important;
+
+  border-radius: var(--jb-radius-md) !important;
+}
+
+.result-explanation {
+  color: var(--jb-text-secondary) !important;
+}
+
+/* =========================================================
+   11. SHOW STEPS BUTTON
+========================================================= */
+
+#stepsBtn {
+  color: var(--jb-accent-dark) !important;
+
+  background: var(--jb-accent-soft) !important;
+
+  border: 1px solid #bddce8 !important;
+
+  border-radius: var(--jb-radius-sm) !important;
+
+  font-weight: 800 !important;
+}
+
+#stepsBtn:hover {
+  color: #ffffff !important;
+
+  background: var(--jb-accent) !important;
+
+  border-color: var(--jb-accent) !important;
+}
+
+/* =========================================================
+   12. STEP CARDS
+========================================================= */
+
+.jabrino-step-card {
+  background: var(--jb-surface) !important;
+
+  border: 1px solid var(--jb-border) !important;
+
+  border-right: 3px solid var(--jb-accent) !important;
+
+  border-radius: var(--jb-radius-md) !important;
+
+  box-shadow: var(--jb-shadow-xs) !important;
+
+  transition:
+    border-color var(--jb-transition),
+    box-shadow var(--jb-transition),
+    transform var(--jb-transition),
+    background var(--jb-transition) !important;
+}
+
+.jabrino-step-card:hover {
+  background: #fcfdfe !important;
+
+  border-color: #cbd9e1 !important;
+
+  box-shadow: var(--jb-shadow-sm) !important;
+
+  transform: translateY(-1px);
+}
+
+.jabrino-step-title {
+  color: var(--jb-text-strong) !important;
+
+  font-weight: 800 !important;
+}
+
+.jabrino-step-index {
+  color: var(--jb-text-muted) !important;
+}
+
+.jabrino-step-kind {
+  color: var(--jb-primary) !important;
+
+  background: var(--jb-primary-soft) !important;
+
+  border: 1px solid #d5e1e9;
+
+  font-weight: 700;
+}
+
+.jabrino-step-text {
+  color: var(--jb-text-secondary) !important;
+}
+
+.jabrino-step-math .math-scroll-area {
+  background: var(--jb-surface-soft) !important;
+
+  border: 1px dashed #cbd8df !important;
+
+  border-radius: var(--jb-radius-md) !important;
+}
+
+/* ---------- Different step semantics ---------- */
+
+.jabrino-step-card.step-solution {
+  border-right-color: var(--jb-success) !important;
+}
+
+.jabrino-step-card.step-warning {
+  border-right-color: var(--jb-warning) !important;
+}
+
+.jabrino-step-card.step-identity {
+  border-right-color: #7067a8 !important;
+}
+
+/* =========================================================
+   13. SCROLLBARS
+========================================================= */
+
+.math-scroll-area::-webkit-scrollbar,
+.jabrino-step-math .math-scroll-area::-webkit-scrollbar {
+  height: 6px;
+}
+
+.math-scroll-area::-webkit-scrollbar-track,
+.jabrino-step-math .math-scroll-area::-webkit-scrollbar-track {
+  background: var(--jb-surface-muted) !important;
+
+  border-radius: var(--jb-radius-pill);
+}
+
+.math-scroll-area::-webkit-scrollbar-thumb,
+.jabrino-step-math .math-scroll-area::-webkit-scrollbar-thumb {
+  background: #a7bac6 !important;
+
+  border-radius: var(--jb-radius-pill);
+}
+
+.math-scroll-area::-webkit-scrollbar-thumb:hover,
+.jabrino-step-math .math-scroll-area::-webkit-scrollbar-thumb:hover {
+  background: var(--jb-text-muted) !important;
+}
+
+/* =========================================================
+   14. ERROR
+========================================================= */
+
+#error {
+  color: var(--jb-danger-dark) !important;
+}
+
+.error-box,
+.error-message {
+  color: var(--jb-danger-dark) !important;
+
+  background: var(--jb-danger-soft) !important;
+
+  border-color: var(--jb-danger-border) !important;
+}
+
+/* =========================================================
+   15. MODAL SYSTEM
+========================================================= */
+
+.modal {
+  background: rgba(15, 30, 45, 0.48) !important;
+
+  backdrop-filter: blur(7px);
+}
+
+.modal-content {
+  color: var(--jb-text);
+
+  background: linear-gradient(180deg, #ffffff, #fbfcfd) !important;
+
+  border: 1px solid rgba(220, 229, 234, 0.95) !important;
+
+  border-top: 5px solid var(--jb-primary) !important;
+
+  border-bottom: 1px solid var(--jb-border) !important;
+
+  border-radius: var(--jb-radius-xl) !important;
+
+  box-shadow: var(--jb-shadow-modal) !important;
+}
+
+#historyModal .modal-content {
+  border-top-color: var(--jb-accent) !important;
+
+  border-bottom: 1px solid var(--jb-border) !important;
+}
+
+.modal-content h2,
+.modal-content h3 {
+  color: var(--jb-primary) !important;
+}
+
+.modal-content h2 {
+  border-bottom: 1px solid var(--jb-border-soft) !important;
+}
+
+.modal-content::-webkit-scrollbar-track {
+  background: var(--jb-surface-muted) !important;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background: #9eb4c0 !important;
+}
+
+/* =========================================================
+   16. CLOSE BUTTON
+========================================================= */
+
+.close-btn,
+.mathematician-detail-close-btn {
+  color: var(--jb-text-muted) !important;
+
+  background: var(--jb-surface-soft) !important;
+
+  border: 1px solid var(--jb-border) !important;
+
+  box-shadow: none !important;
+}
+
+.close-btn:hover,
+.mathematician-detail-close-btn:hover {
+  color: var(--jb-danger) !important;
+
+  background: var(--jb-danger-soft) !important;
+
+  border-color: var(--jb-danger-border) !important;
+
+  transform: scale(1.04);
+}
+
+/* =========================================================
+   17. HELP
+========================================================= */
+
+.help-section,
+.history-box {
+  background: var(--jb-surface) !important;
+
+  border: 1px solid var(--jb-border) !important;
+
+  border-right: 3px solid var(--jb-accent) !important;
+
+  border-radius: var(--jb-radius-md) !important;
+}
+
+.help-section:hover,
+.history-box:hover {
+  background: var(--jb-surface-soft) !important;
+}
+
+.help-section h3 {
+  color: var(--jb-primary) !important;
+}
+
+.help-section h3::after {
+  background: linear-gradient(
+    to left,
+    var(--jb-accent),
+    transparent
+  ) !important;
+}
+
+.help-section p {
+  color: var(--jb-text-secondary) !important;
+}
+
+.help-section code {
+  color: var(--jb-accent-dark) !important;
+
+  background: var(--jb-accent-soft-2) !important;
+
+  border-color: var(--jb-border) !important;
+}
+
+/* =========================================================
+   18. HISTORY
+========================================================= */
+
+.history-box {
+  border-right-color: #8195a3 !important;
+}
+
+#clearHistoryBtn {
+  background: var(--jb-danger) !important;
+
+  border-radius: var(--jb-radius-sm) !important;
+
+  font-family: inherit !important;
+}
+
+#clearHistoryBtn:hover {
+  background: var(--jb-danger-dark) !important;
+}
+
+/* =========================================================
+   19. ABOUT
+========================================================= */
+
+.section-title {
+  color: var(--jb-primary) !important;
+}
+
+.section-text,
+.person-role {
+  color: var(--jb-text-secondary) !important;
+}
+
+.appreciation-box {
+  background: var(--jb-surface-soft) !important;
+
+  border: 1px solid var(--jb-border) !important;
+
+  border-radius: var(--jb-radius-md) !important;
+}
+
+.person-item {
+  border-bottom-color: var(--jb-border-soft) !important;
+}
+
+.person-name,
+.appreciation-intro {
+  color: var(--jb-text-strong) !important;
+}
+
+/* =========================================================
+   20. MATHEMATICIANS
+========================================================= */
+
+.mathematicians-intro {
+  color: var(--jb-text-secondary) !important;
+}
+
+.mathematician-search-bar input {
+  color: var(--jb-text) !important;
+
+  background: var(--jb-surface) !important;
+
+  border-color: var(--jb-border-strong) !important;
+
+  border-radius: var(--jb-radius-sm) !important;
+}
+
+.mathematician-search-bar input:focus {
+  border-color: var(--jb-accent) !important;
+
+  box-shadow: 0 0 0 3px rgba(47, 128, 163, 0.1);
+}
+
+.mathematician-search-bar button {
+  color: #ffffff !important;
+
+  background: var(--jb-primary) !important;
+
+  border-color: var(--jb-primary) !important;
+
+  border-radius: var(--jb-radius-sm) !important;
+}
+
+.mathematician-search-bar button:hover {
+  background: var(--jb-primary-hover) !important;
+}
+
+.mathematician-card {
+  background: var(--jb-surface) !important;
+
+  border: 1px solid var(--jb-border) !important;
+
+  border-radius: var(--jb-radius-md) !important;
+
+  box-shadow: var(--jb-shadow-xs);
+}
+
+.mathematician-card:hover {
+  border-color: #c6d5dd !important;
+
+  box-shadow: var(--jb-shadow-sm);
+
+  transform: translateY(-1px);
+}
+
+.mathematician-card h3 {
+  color: var(--jb-primary) !important;
+}
+
+.mathematician-card p,
+.mathematician-detail-text {
+  color: var(--jb-text-secondary) !important;
+}
+
+.mathematician-card-image,
+.mathematician-detail-image {
+  background: var(--jb-surface-muted) !important;
+
+  border-color: var(--jb-border) !important;
+}
+
+.mathematician-image-placeholder {
+  color: var(--jb-accent) !important;
+}
+
+.mathematician-detail {
+  background: var(--jb-surface) !important;
+
+  border: 1px solid var(--jb-border) !important;
+
+  border-right: 3px solid var(--jb-accent) !important;
+
+  border-radius: var(--jb-radius-md) !important;
+}
+
+.mathematician-detail h3,
+.mathematician-detail-view h2 {
+  color: var(--jb-primary) !important;
+}
+
+.mathematician-source-link {
+  color: var(--jb-accent-dark) !important;
+
+  background: var(--jb-accent-soft) !important;
+
+  border-color: #c5e1ea !important;
+
+  border-radius: var(--jb-radius-sm) !important;
+}
+
+.mathematician-source-link:hover {
+  color: var(--jb-primary) !important;
+
+  background: #dff0f5 !important;
+}
+
+/* =========================================================
+   21. LEGACY STEP DETAIL
+========================================================= */
+
+.jabrino-step-detail-icon {
+  color: var(--jb-primary) !important;
+
+  background: var(--jb-primary-soft) !important;
+
+  border-color: #bfd0da !important;
+}
+
+.jabrino-step-detail-icon:hover {
+  background: var(--jb-primary-soft-hover) !important;
+}
+
+.jabrino-step-detail-box {
+  color: var(--jb-text-secondary);
+
+  background: var(--jb-surface-soft) !important;
+
+  border-color: var(--jb-border) !important;
+
+  border-radius: var(--jb-radius-sm) !important;
+}
+
+/* =========================================================
+   22. IRAN FOOTER BAR
+   تبدیل از عنصر غالب به امضای ظریف
+========================================================= */
+
+.iran-footer-bar {
+  opacity: 0.32;
+
+  height: 3px !important;
+
+  filter: saturate(0.65);
+}
+
+/* =========================================================
+   23. SELECTION
+========================================================= */
+
+::selection {
+  color: var(--jb-primary-dark);
+
+  background: rgba(47, 128, 163, 0.18);
+}
+
+/* =========================================================
+   24. RESPONSIVE
+========================================================= */
+
+@media (max-width: 768px) {
+  .container {
+    border-radius: var(--jb-radius-lg) !important;
+
+    box-shadow: var(--jb-shadow-md) !important;
+  }
+
+  .jabrino-step-card {
+    border-right-width: 3px !important;
+  }
+}
+
+@media (max-width: 520px) {
+  body {
+    background: linear-gradient(180deg, #f4f8fa, #ffffff) !important;
+  }
+
+  .container {
+    border-radius: var(--jb-radius-lg) !important;
+  }
+}
+
+/* =========================================================
+   25. REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+
+    animation-duration: 0.01ms !important;
+
+    animation-iteration-count: 1 !important;
+
+    transition-duration: 0.01ms !important;
+  }
+}
