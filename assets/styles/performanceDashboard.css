@@ -92,9 +92,9 @@
 
   overflow-y: auto;
 
-  border-top-color: var(--jabrino-primary) !important;
+  border-top: 6px solid #047857;
 
-  border-bottom-color: var(--jabrino-teal) !important;
+  border-bottom: 6px solid #0284c7;
 
   background: linear-gradient(180deg, #ffffff 0%, #fbfdfc 100%);
 
@@ -951,5 +951,572 @@
 
   .performance-dashboard-heading h2 {
     font-size: 21px;
+  }
+}
+
+/* =========================================================
+   JABRINO PERFORMANCE DASHBOARD — PHASE 2 POLISH
+   Readability, hierarchy and consistency only.
+========================================================= */
+
+.performance-modal-content {
+  background: linear-gradient(180deg, #ffffff 0%, #f9fbfc 100%);
+  border-top-color: var(--jabrino-primary, #17466f);
+  border-bottom-color: var(--jabrino-teal, #1c9a91);
+}
+
+.performance-dashboard-header {
+  border-bottom-color: #dfe8ec;
+}
+
+.performance-dashboard-eyebrow {
+  color: var(--jabrino-blue, #347fa3);
+  font-size: 12px;
+}
+
+.performance-dashboard-heading h2 {
+  color: var(--jabrino-primary, #17466f);
+}
+
+.performance-dashboard-heading p {
+  color: #607486;
+  font-size: 13px;
+}
+
+.performance-dashboard-score {
+  background: linear-gradient(145deg, #eef6f9, #ffffff);
+  border-color: #c9dce5;
+  box-shadow: 0 6px 17px rgba(23, 70, 111, 0.07);
+}
+
+.performance-dashboard-score strong {
+  color: var(--jabrino-primary, #17466f);
+}
+
+.performance-dashboard-score span {
+  color: #607486;
+  font-size: 11px;
+}
+
+.performance-stat-card {
+  border-color: #dfe8ec;
+  box-shadow: 0 4px 13px rgba(16, 42, 67, 0.035);
+}
+
+.performance-stat-card:hover {
+  box-shadow: 0 8px 19px rgba(16, 42, 67, 0.06);
+}
+
+.performance-stat-content strong {
+  color: #193047;
+}
+
+.performance-stat-title {
+  color: #40576b;
+  font-size: 12px;
+}
+
+.performance-stat-content small {
+  color: #8191a0;
+  font-size: 10px;
+}
+
+.performance-stat-card.is-neutral .performance-stat-icon {
+  color: var(--jabrino-primary, #17466f);
+  background: #edf4f7;
+}
+
+.performance-stat-card.is-blue .performance-stat-icon {
+  color: var(--jabrino-blue, #347fa3);
+  background: #eaf5f8;
+}
+
+.performance-stat-card.is-success .performance-stat-icon {
+  color: var(--jabrino-success, #16856b);
+  background: var(--jabrino-success-light, #eaf8f3);
+}
+
+.performance-stat-card.is-warning .performance-stat-icon {
+  color: var(--jabrino-warning, #c98228);
+  background: var(--jabrino-warning-light, #fff7e9);
+}
+
+.performance-insight {
+  color: #40576b;
+  background: linear-gradient(90deg, #edf7f8, #ffffff);
+  border-color: #cde5e5;
+  border-right-color: var(--jabrino-teal, #1c9a91);
+}
+
+.performance-insight-icon {
+  color: var(--jabrino-teal, #1c9a91);
+  background: var(--jabrino-teal-light, #e7f8f5);
+}
+
+.performance-insight strong {
+  color: var(--jabrino-primary, #17466f);
+  font-size: 13px;
+}
+
+.performance-insight p {
+  color: #526a7e;
+  font-size: 12px;
+}
+
+.performance-section {
+  border-top-color: #dfe8ec;
+}
+
+.performance-section-header h3 {
+  color: #193047;
+  font-size: 17px;
+}
+
+.performance-section-header p {
+  color: #607486;
+  font-size: 12px;
+}
+
+.performance-section-count {
+  color: var(--jabrino-primary, #17466f);
+  background: #edf5f8;
+  border-color: #c9dce5;
+  font-size: 12px;
+}
+
+.performance-attempt-card {
+  border-color: #dfe8ec;
+  box-shadow: 0 3px 11px rgba(16, 42, 67, 0.03);
+}
+
+.performance-attempt-card:hover {
+  box-shadow: 0 8px 18px rgba(16, 42, 67, 0.055);
+}
+
+.performance-attempt-date {
+  color: #8191a0;
+  font-size: 10px;
+}
+
+.performance-attempt-status {
+  font-size: 10px;
+}
+
+.performance-attempt-status.is-first {
+  color: #126b58;
+  background: #eaf8f3;
+}
+
+.performance-attempt-status.is-corrected {
+  color: var(--jabrino-blue, #347fa3);
+  background: #eaf5f8;
+}
+
+.performance-attempt-status.is-review {
+  color: #8c5c22;
+  background: #fff7e9;
+}
+
+.performance-problem-box {
+  background: #f7fafb;
+  border-color: #cbdbe3;
+}
+
+.performance-attempt-meta span,
+.performance-attempt-skills span {
+  font-size: 9px;
+}
+
+.performance-attempt-skills span {
+  color: #286987;
+  background: #eaf5f8;
+  border-color: #c5e0ea;
+}
+
+.performance-retry-btn {
+  color: var(--jabrino-primary, #17466f);
+  border-color: #bfd5df;
+  font-size: 11px;
+}
+
+.performance-retry-btn:hover {
+  color: #ffffff;
+  background: var(--jabrino-primary, #17466f);
+  border-color: var(--jabrino-primary, #17466f);
+}
+
+.performance-skill-row {
+  border-color: #dfe8ec;
+}
+
+.performance-skill-heading span {
+  color: #40576b;
+  font-size: 11px;
+}
+
+.performance-skill-heading strong {
+  color: var(--jabrino-primary, #17466f);
+  font-size: 12px;
+}
+
+.performance-skill-bar {
+  background: #dfe8ec;
+}
+
+.performance-skill-bar span {
+  background: linear-gradient(
+    90deg,
+    var(--jabrino-primary, #17466f),
+    var(--jabrino-teal, #1c9a91)
+  );
+}
+
+.performance-skill-row small {
+  color: #8191a0;
+  font-size: 9px;
+}
+
+.performance-small-empty,
+.performance-empty-state p {
+  color: #607486;
+}
+
+.performance-empty-icon {
+  color: var(--jabrino-primary, #17466f);
+  background: #edf5f8;
+  border-color: #c9dce5;
+}
+
+.performance-empty-state h3 {
+  color: #193047;
+}
+
+.performance-start-btn {
+  background: linear-gradient(
+    135deg,
+    var(--jabrino-primary, #17466f),
+    var(--jabrino-blue, #347fa3)
+  );
+}
+/* =========================================================
+   PERFORMANCE DASHBOARD
+   SECTION SEPARATION POLISH
+========================================================= */
+
+/* ---------------------------------------------------------
+   Each dashboard section becomes a clear visual block
+--------------------------------------------------------- */
+
+.performance-section {
+  margin-top: 22px;
+  padding: 16px;
+
+  background: #f8fbfc;
+
+  border: 1px solid #dfe9ee;
+  border-radius: 16px;
+
+  box-shadow: 0 3px 10px rgba(15, 23, 42, 0.025);
+}
+
+/* ---------------------------------------------------------
+   Stronger section header
+--------------------------------------------------------- */
+
+.performance-section-header {
+  align-items: center;
+
+  margin-bottom: 14px;
+  padding-bottom: 11px;
+
+  border-bottom: 1px solid #d9e5ea;
+}
+
+/* ---------------------------------------------------------
+   Section title
+--------------------------------------------------------- */
+
+.performance-section-header h3 {
+  color: #17466f;
+
+  font-size: 17px;
+  font-weight: 900;
+}
+
+/* ---------------------------------------------------------
+   Section description
+--------------------------------------------------------- */
+
+.performance-section-header p {
+  margin-top: 2px;
+
+  color: #66788a;
+
+  font-size: 11px;
+}
+
+/* ---------------------------------------------------------
+   Section counter
+--------------------------------------------------------- */
+
+.performance-section-count {
+  min-width: 31px;
+  height: 31px;
+
+  color: #17466f;
+
+  background: #eaf3f8;
+
+  border-color: #c6dce6;
+}
+
+/* =========================================================
+   SECTION PERSONALITIES
+========================================================= */
+
+/* ---------------------------------------------------------
+   Needs Review
+--------------------------------------------------------- */
+
+.performance-section.is-review-section {
+  background: linear-gradient(180deg, #fffdfa, #ffffff);
+
+  border-color: #eadfce;
+}
+
+.performance-section.is-review-section .performance-section-header {
+  border-bottom-color: #eadfce;
+}
+
+.performance-section.is-review-section .performance-section-header h3 {
+  color: #9a6125;
+}
+
+/* ---------------------------------------------------------
+   Recent Attempts
+--------------------------------------------------------- */
+
+.performance-section.is-recent-section {
+  background: linear-gradient(180deg, #f9fcfd, #ffffff);
+
+  border-color: #dce8ed;
+}
+
+/* ---------------------------------------------------------
+   Skills
+--------------------------------------------------------- */
+
+.performance-section.is-skills-section {
+  background: linear-gradient(180deg, #f7fbfa, #ffffff);
+
+  border-color: #d5e8e4;
+}
+
+.performance-section.is-skills-section .performance-section-header h3 {
+  color: #167d76;
+}
+
+/* =========================================================
+   ATTEMPT CARDS INSIDE SECTION
+========================================================= */
+
+.performance-section .performance-attempt-card {
+  background: #ffffff;
+
+  border-color: #dde7eb;
+
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.025);
+}
+
+/* ---------------------------------------------------------
+   Slightly stronger hover
+--------------------------------------------------------- */
+
+.performance-section .performance-attempt-card:hover {
+  box-shadow: 0 7px 18px rgba(15, 23, 42, 0.055);
+}
+
+/* =========================================================
+   SKILL ROWS
+========================================================= */
+
+.performance-section .performance-skill-row {
+  background: #ffffff;
+
+  border-color: #dce7eb;
+
+  box-shadow: 0 2px 7px rgba(15, 23, 42, 0.02);
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 760px) {
+  .performance-section {
+    padding: 13px;
+
+    border-radius: 14px;
+  }
+
+  .performance-section-header h3 {
+    font-size: 15px;
+  }
+}
+/* =========================================================
+   PERFORMANCE DASHBOARD
+   SECTION HIERARCHY — CLEAN VERSION
+========================================================= */
+
+/* ---------------------------------------------------------
+   Dashboard canvas
+--------------------------------------------------------- */
+
+.performance-modal-content {
+  background: #f6f9fb;
+}
+
+/* ---------------------------------------------------------
+   Main visual section
+--------------------------------------------------------- */
+
+.performance-section {
+  position: relative;
+
+  margin-top: 24px;
+  padding: 17px 18px 18px;
+
+  background: #ffffff;
+
+  border: 1px solid #dce6eb;
+  border-radius: 16px;
+
+  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.035);
+}
+
+/* ---------------------------------------------------------
+   Brand marker
+--------------------------------------------------------- */
+
+.performance-section::before {
+  content: "";
+
+  position: absolute;
+
+  top: 16px;
+  right: -1px;
+
+  width: 4px;
+  height: 38px;
+
+  background: #17466f;
+
+  border-radius: 4px 0 0 4px;
+}
+
+/* ---------------------------------------------------------
+   Section header
+--------------------------------------------------------- */
+
+.performance-section-header {
+  align-items: flex-start;
+
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+
+  border-bottom: 1px solid #e2eaee;
+}
+
+/* ---------------------------------------------------------
+   Section title
+--------------------------------------------------------- */
+
+.performance-section-header h3 {
+  margin: 0 0 4px;
+
+  color: #17466f;
+
+  font-size: 17px;
+  font-weight: 900;
+}
+
+/* ---------------------------------------------------------
+   Section description
+--------------------------------------------------------- */
+
+.performance-section-header p {
+  margin: 0;
+
+  color: #718293;
+
+  font-size: 11px;
+  line-height: 1.8;
+}
+
+/* ---------------------------------------------------------
+   Section count
+--------------------------------------------------------- */
+
+.performance-section-count {
+  min-width: 31px;
+  height: 31px;
+
+  color: #17466f;
+
+  background: #edf5f8;
+
+  border: 1px solid #cadfe7;
+
+  box-shadow: none;
+}
+
+/* =========================================================
+   ITEMS INSIDE SECTIONS
+========================================================= */
+
+.performance-section .performance-attempt-card,
+.performance-section .performance-skill-row {
+  background: #ffffff;
+
+  border-color: #dce6eb;
+
+  box-shadow: 0 2px 7px rgba(15, 23, 42, 0.025);
+}
+
+/* ---------------------------------------------------------
+   Attempt hover
+--------------------------------------------------------- */
+
+.performance-section .performance-attempt-card:hover {
+  box-shadow: 0 7px 17px rgba(15, 23, 42, 0.055);
+}
+
+/* =========================================================
+   SPACE BETWEEN SECTIONS
+========================================================= */
+
+.performance-section + .performance-section {
+  margin-top: 28px;
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 760px) {
+  .performance-section {
+    padding: 14px;
+
+    border-radius: 14px;
+  }
+
+  .performance-section::before {
+    top: 14px;
+
+    height: 34px;
+  }
+
+  .performance-section-header h3 {
+    font-size: 15px;
   }
 }
